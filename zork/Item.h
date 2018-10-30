@@ -1,11 +1,16 @@
+#ifndef ITEM_H
+#define ITEM_H
+
 #include <string>
 #include <vector>
 #include "Trigger.h"
 
 class Item {
 public:
-    Item();
-    ~Item();
+    Item(std::string);
+    virtual ~Item();
+
+    std::string getName();
 
 private:
     std::string name;
@@ -16,4 +21,6 @@ private:
     std::string turnon_action;
     
     std::vector<Trigger> triggers;    
-}
+};
+
+#endif

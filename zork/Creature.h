@@ -1,12 +1,15 @@
+#ifndef CREATURE_H
+#define CREATURE_H
+
 #include <string>
 #include <vector>
 
 #include "Trigger.h"
 
-class Creature {
+class Creature : public ItemContainer {
 public:
     Creature();
-    ~Creature();
+    virtual ~Creature();
 
 private:
     std::string name;
@@ -16,4 +19,6 @@ private:
 
     std:vector<std::string> vulnerabilities;
     std::vector<Trigger> triggers;
-}
+};
+
+#endif

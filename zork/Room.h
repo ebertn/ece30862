@@ -1,3 +1,6 @@
+#ifndef ROOM_H
+#define ROOM_H
+
 #include <string>
 #include <vector>
 #include "Container.h"
@@ -5,10 +8,10 @@
 #include "Creature.h"
 #include "Trigger.h"
 
-class Room {
+class Room : public ItemContainer {
 public:
     Room();
-    ~Room();
+    virtual ~Room();
 
 private: 
     std::string name;
@@ -18,7 +21,8 @@ private:
     
     std::vector<Room> borders;
     std::vector<Container> containers;
-    std::vector<Item> items;
     std::vector<Creature> creatures;
     std::vector<Trigger> triggers;    
-}
+};
+
+#endif
