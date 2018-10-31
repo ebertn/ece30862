@@ -30,3 +30,10 @@
 *.exe
 *.out
 *.app
+
+# ide stuff
+*.idea
+*.vscode
+
+# Other (test files)
+test.cpp

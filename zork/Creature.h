@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "Trigger.h"
+#include "ItemContainer.h"
 
 class Creature : public ItemContainer {
 public:
@@ -17,7 +18,7 @@ private:
     std::string description;
     std::string attack;
 
-    std:vector<std::string> vulnerabilities;
+    std::vector<std::string> vulnerabilities;
     std::vector<Trigger> triggers;
 };
 

@@ -10,7 +10,7 @@
 class ItemContainer {
 public:
     ItemContainer();
-    virtual ~ItemContainer();
+    ~ItemContainer();
 
     virtual void add(Item&);
     virtual void print();

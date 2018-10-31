@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "Item.h"
+#include "ItemContainer.h"
 
 class Container : public ItemContainer {
 public:
