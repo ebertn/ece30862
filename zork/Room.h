@@ -4,11 +4,11 @@
 #include <string>
 #include <vector>
 #include "pugixml-1.9/src/pugixml.hpp"
-#include "Container.h"
+#include "Container.h" 
 #include "Item.h"
 #include "Creature.h"
 #include "Trigger.h"
-#include "ItemContainer.h"
+#include "ObjectContainer.h"
 
 struct Borders {
     std::string n;
@@ -17,9 +17,9 @@ struct Borders {
     std::string w;
 };
 
-class Room : public ItemContainer {
+class Room : public ObjectContainer<Item> {
 public:
-    Room(pugi::xml_node);
+    Room(pugi::xml_node, ObjectContainer<Item>&);
     virtual ~Room();
 
     virtual std::string getName();
@@ -34,9 +34,9 @@ private:
     std::string description;
     
     Borders borders; // 0 = n, 1 = s, 2 = e, 3 = w
-    //std::vector<Container> containers;
-    //std::vector<Creature> creatures;
-    //std::vector<Trigger> triggers;    
+    //ObjectContainer<Container> containers;
+    //ObjectContainer<Creature> creatures;
+    //ObjectContainer<Trigger> triggers;    
 };
 
 

@@ -1,8 +1,8 @@
-#include "Room.h"
+#include "Room.h" 
 
 using namespace pugi;
 
-Room::Room(pugi::xml_node spec){ 
+Room::Room(pugi::xml_node spec, ObjectContainer<Item>& game_items){   
     this->type = "regular";
 
     for (pugi::xml_node node = spec.first_child(); node; node = node.next_sibling()){
@@ -31,7 +31,8 @@ Room::Room(pugi::xml_node spec){
         } else if (node_name == "container"){
             
         } else if (node_name == "item"){
-            
+            Item new_item = Item(*(game_items.get_object_by_name(node.child_value())));
+            this->add_object(new_item);
         } else if (node_name == "creature"){
             
         } else if (node_name == "trigger"){

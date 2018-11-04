@@ -3,14 +3,19 @@
 
 #include <string>
 #include <vector>
+#include "pugixml-1.9/src/pugixml.hpp"
 #include "Trigger.h"
 
 class Item {
 public:
-    Item(std::string);
+    Item(pugi::xml_node);
+    Item(const Item&);
     virtual ~Item();
 
-    std::string getName();
+    virtual std::string getName();
+    virtual std::string getStatus();
+    virtual std::string getDesc();
+    virtual std::string getWriting();
 
 private:
     std::string name;
@@ -20,7 +25,7 @@ private:
     std::string turnon_print;
     std::string turnon_action;
     
-    std::vector<Trigger> triggers;    
+    std::vector<Trigger> triggers;   
 };
 
 #endif

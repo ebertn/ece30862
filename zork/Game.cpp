@@ -9,14 +9,18 @@ Game::~Game(){}
 
 void Game::start(){ 
     read_xml();
-    print_rooms();
-    this->cur_room = get_room_by_name("Entrance");
+    //print_rooms();
+    //print_items();
 
-    while(this->game_running)
+    enter_room("Entrance");
+    while(this->game_running) {
+        cout << "> ";
         handle_input();
+    }
 }
 
 void Game::read_xml(){
+    
     pugi::xml_document doc;
     pugi::xml_parse_result result = doc.load_file(this->filename.c_str());
 
@@ -27,7 +31,23 @@ void Game::read_xml(){
 
     pugi::xml_node top = doc.first_child();
 
-    for (pugi::xml_node panel = top.first_child(); panel != NULL; panel = panel.next_sibling()){
+    // Create items
+    for (pugi::xml_node panel = top.child("item"); panel != NULL; 
+                                panel = panel.next_sibling("item")){
+        create_object(panel);
+    }
+    // Create containers
+    for (pugi::xml_node panel = top.child("container"); panel != NULL; 
+                                panel = panel.next_sibling("container")){
+        create_object(panel);
+    }
+    // Create creatures
+    for (pugi::xml_node panel = top.child("creature"); panel != NULL; 
+                                panel = panel.next_sibling("creature")){
+        create_object(panel);
+    }
+    // Create rooms
+    for (pugi::xml_node panel = top.child("room"); panel != NULL; panel = panel.next_sibling("room")){
         create_object(panel);
     }
 }
@@ -36,23 +56,38 @@ void Game::print_rooms(){
     for (int i = 0; i < this->rooms.size(); i++){
         cout << "Name: " << this->rooms.at(i).getName() << endl;
         cout << "Desc: " << this->rooms.at(i).getDesc() << endl;
-        cout << ("    n: " + this->rooms.at(i).getBorders().n) << endl;
-        cout << ("    s: " + this->rooms.at(i).getBorders().s) << endl;
-        cout << ("    e: " + this->rooms.at(i).getBorders().e) << endl;
-        cout << ("    w: " + this->rooms.at(i).getBorders().w) << endl;
+        cout << "Items: ";
+        this->rooms.at(i).print_objects();
+        cout << "Borders: " << endl;
+        cout << "    n: " << this->rooms.at(i).getBorders().n << endl;
+        cout << "    s: " << this->rooms.at(i).getBorders().s << endl;
+        cout << "    e: " << this->rooms.at(i).getBorders().e << endl;
+        cout << "    w: " << this->rooms.at(i).getBorders().w << endl;
+        cout << endl;
+    }
+}
+
+void Game::print_items(){ 
+    for (int i = 0; i < this->items.size(); i++){
+        cout << "Name: " << this->items.at(i).getName() << endl;
+        cout << "Status: " << this->items.at(i).getStatus() << endl;
+        cout << "Desc: " << this->items.at(i).getDesc() << endl;
+        cout << "Writing: " << this->items.at(i).getWriting() << endl;
+        cout << endl;
     }
 }
 
 void Game::create_object(pugi::xml_node spec){
     string obj_name = (string) spec.name();
     if (obj_name == "room"){
-        Room room = Room(spec);
-        this->rooms.push_back(room);
-    } else if (spec.name() == "item"){
+        Room room = Room(spec, this->items); 
+        this->rooms.push_back(room); 
+    } else if (obj_name == "item"){
+        Item item = Item(spec); 
+        this->items.add_object(item);
+    } else if (obj_name == "container"){
 
-    } else if (spec.name() == "container"){
-
-    } else if (spec.name() == "creature"){
+    } else if (obj_name == "creature"){
 
     }
 }
@@ -94,23 +129,25 @@ void Game::handle_input(){
     if (input == "n" || input == "s" || input == "e" || input == "w"){
         move(input);
     } else if (input == "i"){
-        
+        print_inv();
     } else if (input.substr(0, 4) == "take"){
         string item = get_single_param(input);
-        cout << item << endl;
+        take(item);
     } else if (input == "open exit"){
         if (this->cur_room->getType() == "exit"){
             game_over();
+        } else {
+            cout << "This room is not an exit" << endl;
         }
     } else if (input.substr(0, 4) == "open"){
         string container = get_single_param(input);
         cout << container << endl;
     } else if (input.substr(0, 4) == "read"){
         string item = get_single_param(input);
-        cout << item << endl;
+        read(item);
     } else if (input.substr(0, 4) == "drop"){
         string item = get_single_param(input);
-        cout << item << endl;
+        drop(item);
     } else if (input.substr(0, 3) == "put"){
         str_tuple params = get_two_params(input, "in");
         cout << "Param1 = " + params.param1 << endl;
@@ -130,6 +167,45 @@ void Game::handle_input(){
 void Game::game_over(){
     cout << "Game Over" << endl;
     this->game_running = 0;
+}
+
+// string owner is a room or container name
+void Game::add(string object, string owner){
+    //string type;
+    //if (items.object_exists(object)) type = "item";
+    //if (containers.)
+}
+
+void Game::take(string item_name){
+    if (cur_room->object_exists(item_name)){
+        Item removed = cur_room->remove_object(item_name);
+        player_inv.add_object(removed);
+    } else {
+        cout << "There is no " << item_name << " in this room." << endl;
+    }
+}
+
+void Game::drop(string item_name){
+    if (player_inv.object_exists(item_name)){
+        Item removed = player_inv.remove_object(item_name);
+        cur_room->add_object(removed);
+    } else {
+        cout << "You are not carrying " << item_name << endl;
+    }
+}
+
+void Game::print_inv(){
+    cout << "Inventory: ";
+    this->player_inv.print_objects();
+}
+
+void Game::read(string item_name){
+    if (player_inv.object_exists(item_name)){
+        string writing = (*this->player_inv.get_object_by_name(item_name)).getWriting();
+        cout << (writing == "" ? "Nothing written." : writing) << endl;
+    } else {
+        cout << "You are not carrying " << item_name << endl;
+    }
 }
 
 string Game::get_single_param(string input){

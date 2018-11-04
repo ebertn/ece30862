@@ -5,9 +5,9 @@
 #include <vector>
 
 #include "Item.h"
-#include "ItemContainer.h"
+#include "ObjectContainer.h"
 
-class Container : public ItemContainer {
+class Container : public ObjectContainer<Item> {
 public:
     Container();
     virtual ~Container();
@@ -18,7 +18,7 @@ private:
     std::string description;
 
     std::vector<std::string> accept;
-    std::vector<Trigger> triggers;
+    ObjectContainer<Trigger> triggers;
 };
 
 #endif

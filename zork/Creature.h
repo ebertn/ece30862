@@ -5,9 +5,8 @@
 #include <vector>
 
 #include "Trigger.h"
-#include "ItemContainer.h"
 
-class Creature : public ItemContainer {
+class Creature {
 public:
     Creature();
     virtual ~Creature();
