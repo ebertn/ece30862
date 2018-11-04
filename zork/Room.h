@@ -8,7 +8,7 @@
 #include "Item.h"
 #include "Creature.h"
 #include "Trigger.h"
-#include "ObjectContainer.h"
+#include "ItemContainer.h"
 
 struct Borders {
     std::string n;
@@ -17,9 +17,9 @@ struct Borders {
     std::string w;
 };
 
-class Room : public ObjectContainer<Item> {
+class Room : public ItemContainer {
 public:
-    Room(pugi::xml_node, ObjectContainer<Item>&);
+    Room(pugi::xml_node, ItemContainer&);
     virtual ~Room();
 
     virtual std::string getName();
@@ -34,9 +34,9 @@ private:
     std::string description;
     
     Borders borders; // 0 = n, 1 = s, 2 = e, 3 = w
-    //ObjectContainer<Container> containers;
-    //ObjectContainer<Creature> creatures;
-    //ObjectContainer<Trigger> triggers;    
+    //std::vector<Container> containers;
+    //std::vector<Creature> creatures;
+    //std::vector<Trigger> triggers;    
 };
 
 

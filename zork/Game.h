@@ -7,7 +7,7 @@
 #include "pugixml-1.9/src/pugixml.hpp"
 #include "Room.h"
 #include "Item.h"
-#include "ObjectContainer.h"
+#include "ItemContainer.h"
 
 struct str_tuple {
     std::string param1;
@@ -26,8 +26,8 @@ protected:
     std::string filename;
     int game_running; // 1 = running, 0 = GAME OVER
     std::vector<Room> rooms;
-    ObjectContainer<Item> items; // List of potential items. Used to make copies.
-    ObjectContainer<Item> player_inv;
+    ItemContainer items; // List of potential items. Used to make copies.
+    ItemContainer player_inv;
 
     Room* cur_room;
 

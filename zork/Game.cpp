@@ -57,7 +57,7 @@ void Game::print_rooms(){
         cout << "Name: " << this->rooms.at(i).getName() << endl;
         cout << "Desc: " << this->rooms.at(i).getDesc() << endl;
         cout << "Items: ";
-        this->rooms.at(i).print_objects();
+        this->rooms.at(i).print_items();
         cout << "Borders: " << endl;
         cout << "    n: " << this->rooms.at(i).getBorders().n << endl;
         cout << "    s: " << this->rooms.at(i).getBorders().s << endl;
@@ -84,7 +84,7 @@ void Game::create_object(pugi::xml_node spec){
         this->rooms.push_back(room); 
     } else if (obj_name == "item"){
         Item item = Item(spec); 
-        this->items.add_object(item);
+        this->items.add_item(item);
     } else if (obj_name == "container"){
 
     } else if (obj_name == "creature"){
@@ -172,23 +172,23 @@ void Game::game_over(){
 // string owner is a room or container name
 void Game::add(string object, string owner){
     //string type;
-    //if (items.object_exists(object)) type = "item";
+    //if (items.item_exists(object)) type = "item";
     //if (containers.)
 }
 
 void Game::take(string item_name){
-    if (cur_room->object_exists(item_name)){
-        Item removed = cur_room->remove_object(item_name);
-        player_inv.add_object(removed);
+    if (cur_room->item_exists(item_name)){
+        Item removed = cur_room->remove_item(item_name);
+        player_inv.add_item(removed);
     } else {
         cout << "There is no " << item_name << " in this room." << endl;
     }
 }
 
 void Game::drop(string item_name){
-    if (player_inv.object_exists(item_name)){
-        Item removed = player_inv.remove_object(item_name);
-        cur_room->add_object(removed);
+    if (player_inv.item_exists(item_name)){
+        Item removed = player_inv.remove_item(item_name);
+        cur_room->add_item(removed);
     } else {
         cout << "You are not carrying " << item_name << endl;
     }
@@ -196,12 +196,12 @@ void Game::drop(string item_name){
 
 void Game::print_inv(){
     cout << "Inventory: ";
-    this->player_inv.print_objects();
+    this->player_inv.print_items();
 }
 
 void Game::read(string item_name){
-    if (player_inv.object_exists(item_name)){
-        string writing = (*this->player_inv.get_object_by_name(item_name)).getWriting();
+    if (player_inv.item_exists(item_name)){
+        string writing = (*this->player_inv.get_item_by_name(item_name)).getWriting();
         cout << (writing == "" ? "Nothing written." : writing) << endl;
     } else {
         cout << "You are not carrying " << item_name << endl;
