@@ -8,6 +8,9 @@
 #include "Room.h"
 #include "Item.h"
 #include "ItemContainer.h"
+#include "CreatureContainer.h"
+#include "ContainerContainer.h"
+#include "RoomContainer.h"
 
 struct str_tuple {
     std::string param1;
@@ -25,9 +28,11 @@ protected:
 
     std::string filename;
     int game_running; // 1 = running, 0 = GAME OVER
-    std::vector<Room> rooms;
+    RoomContainer rooms;
     ItemContainer items; // List of potential items. Used to make copies.
     ItemContainer player_inv;
+    ContainerContainer containers;
+    CreatureContainer creatures;
 
     Room* cur_room;
 
@@ -42,7 +47,12 @@ protected:
     virtual void take(std::string);
     virtual void drop(std::string);
     virtual void read(std::string);
-    virtual void add(std::string object, std::string owner);
+    virtual void turnon(std::string);
+    virtual void execute_command(std::string);
+    virtual void add(std::string, std::string);
+    virtual void delete_obj(std::string);
+    virtual void update(std::string, std::string);
+    virtual std::string getType(std::string);
     virtual void game_over();
     virtual void print_inv();
 

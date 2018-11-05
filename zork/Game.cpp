@@ -9,10 +9,17 @@ Game::~Game(){}
 
 void Game::start(){ 
     read_xml();
-    //print_rooms();
     //print_items();
+    print_rooms();
+    //execute_command("Add torch to MainCavern");
+    //execute_command("Update torch to MainCavern");
+    //execute_command("Delete torch");
+    //enter_room("Entrance");
+    //execute_command("Delete MainCavern");
+    //delete_obj("torch");
+    //update("torch", "dog");
+    // add("key", "Entrance");
 
-    enter_room("Entrance");
     while(this->game_running) {
         cout << "> ";
         handle_input();
@@ -58,6 +65,8 @@ void Game::print_rooms(){
         cout << "Desc: " << this->rooms.at(i).getDesc() << endl;
         cout << "Items: ";
         this->rooms.at(i).print_items();
+        cout << "Containers:";
+        rooms.at(i).containers.print_containers();
         cout << "Borders: " << endl;
         cout << "    n: " << this->rooms.at(i).getBorders().n << endl;
         cout << "    s: " << this->rooms.at(i).getBorders().s << endl;
@@ -73,6 +82,8 @@ void Game::print_items(){
         cout << "Status: " << this->items.at(i).getStatus() << endl;
         cout << "Desc: " << this->items.at(i).getDesc() << endl;
         cout << "Writing: " << this->items.at(i).getWriting() << endl;
+        cout << "Turnon Action: " << this->items.at(i).getTurnonAction() << endl;
+        cout << "Turnon Print: " << this->items.at(i).getTurnonPrint() << endl;
         cout << endl;
     }
 }
@@ -80,13 +91,14 @@ void Game::print_items(){
 void Game::create_object(pugi::xml_node spec){
     string obj_name = (string) spec.name();
     if (obj_name == "room"){
-        Room room = Room(spec, this->items); 
-        this->rooms.push_back(room); 
+        Room room = Room(spec, this->items, this->containers); 
+        this->rooms.add_room(room); 
     } else if (obj_name == "item"){
         Item item = Item(spec); 
         this->items.add_item(item);
     } else if (obj_name == "container"){
-
+        Container container = Container(spec, this->items); 
+        this->containers.add_container(container);
     } else if (obj_name == "creature"){
 
     }
@@ -149,14 +161,14 @@ void Game::handle_input(){
         string item = get_single_param(input);
         drop(item);
     } else if (input.substr(0, 3) == "put"){
-        str_tuple params = get_two_params(input, "in");
+        str_tuple params = get_two_params(input, " in ");
         cout << "Param1 = " + params.param1 << endl;
         cout << "Param2 = " + params.param2 << endl;
     } else if (input.substr(0, 7) == "turn on"){
         string item = get_single_param(input.substr(5, -1));
-        cout << item << endl;
+        turnon(item);
     } else if (input.substr(0, 7) == ">attack"){
-        str_tuple params = get_two_params(input, "with");
+        str_tuple params = get_two_params(input, " with ");
         cout << "Param1 = " + params.param1 << endl;
         cout << "Param2 = " + params.param2 << endl;
     } else {
@@ -164,16 +176,148 @@ void Game::handle_input(){
     }
 }
 
+void Game::execute_command(string cmd){
+    if (cmd.substr(0, 3) == "Add"){
+        str_tuple params = get_two_params(cmd, " to ");
+        add(params.param1, params.param2);
+    } else if (cmd.substr(0, 6) == "Delete"){
+        string object = get_single_param(cmd);
+        delete_obj(object);
+    } else if (cmd.substr(0, 6) == "Update"){
+        str_tuple params = get_two_params(cmd, " to ");
+        update(params.param1, params.param2);
+    } else if (cmd.substr(0, 9) == "Game Over"){
+        game_over();
+    }
+}
+
+void Game::add(string object, string owner){
+    string type_obj = getType(object);
+    string type_own = getType(owner);
+
+    if(type_obj != "bad" && type_own != "bad"){
+        if (type_own == "room"){
+            Room* room = rooms.get_room_by_name(owner);
+            if (type_obj == "item"){
+                Item new_item = Item(*items.get_item_by_name(object));
+                room->add_item(new_item);
+            } else if (type_obj == "creature"){
+                Creature new_creature = Creature(*creatures.get_creature_by_name(object));
+                room->creatures.add_creature(new_creature);
+            } else if (type_obj == "container"){
+                Container new_container = Container(*containers.get_container_by_name(object));
+                room->containers.add_container(new_container);
+            }
+
+        } else if (type_own == "container"){
+            Container* container = cur_room->containers.get_container_by_name(owner);
+            if (type_obj == "item"){
+                Item new_item = Item(*items.get_item_by_name(object));
+                container->add_item(new_item);
+            }
+        }
+    } else {
+        cout << "Invalid add, bad object or owner" << endl;
+    }  
+}
+
+void Game::delete_obj(string object){
+    string type = getType(object);
+
+    if (type == "item"){
+        for (int i = 0; i < rooms.size(); i++){
+            if(rooms.at(i).item_exists(object)){
+                rooms.at(i).remove_item(object);
+            }
+        }
+    } else if (type == "creature"){
+        for (int i = 0; i < rooms.size(); i++){
+            if(rooms.at(i).creatures.creature_exists(object)){
+                rooms.at(i).creatures.remove_creature(object);
+            }
+        }
+    } else if (type == "container"){
+        for (int i = 0; i < rooms.size(); i++){
+            if(rooms.at(i).containers.container_exists(object)){
+                rooms.at(i).containers.remove_container(object);
+            }
+        }
+    } else if (type == "room"){
+        if (rooms.get_room_by_name(object)->getName() != this->cur_room->getName()){
+            if(rooms.room_exists(object)){
+                if(get_room_by_name(cur_room->getBorders().n)->getName() == object){
+                    cur_room->borders.n = "";
+                } else if(get_room_by_name(cur_room->getBorders().s)->getName() == object){
+                    cur_room->borders.s = "";
+                } else if(get_room_by_name(cur_room->getBorders().e)->getName() == object){
+                    cur_room->borders.e = "";
+                } else if(get_room_by_name(cur_room->getBorders().w)->getName() == object){
+                    cur_room->borders.w = "";
+                }
+                rooms.remove_room(object);
+            }
+        }
+    }
+}
+
+void Game::update(string object, string status){
+    string type = getType(object);
+
+    if (type == "item"){
+        for (int i = 0; i < rooms.size(); i++){
+            if(rooms.at(i).item_exists(object)){
+                //rooms.at(i).remove_item(object);
+                rooms.at(i).get_item_by_name(object)->status = status;
+            } else if (player_inv.item_exists(object)){
+                player_inv.get_item_by_name(object)->status = status;          
+            }
+        }
+    } else if (type == "creature"){
+        for (int i = 0; i < rooms.size(); i++){
+            if(rooms.at(i).creatures.creature_exists(object)){
+                //rooms.at(i).creatures.remove_creature(object);
+                rooms.at(i).creatures.get_creature_by_name(object)->status = status;
+
+            }
+        }
+    } else if (type == "container"){
+        for (int i = 0; i < rooms.size(); i++){
+            if(rooms.at(i).containers.container_exists(object)){
+                // rooms.at(i).containers.remove_container(object);
+                rooms.at(i).containers.get_container_by_name(object)->status = status;
+            }
+        }
+    } else if (type == "room"){
+        if (rooms.get_room_by_name(object)->getName() != cur_room->getName()){
+            if(rooms.room_exists(object)){
+                // rooms.remove_room(object);
+                rooms.get_room_by_name(object)->status = status;
+            }
+        }
+    }
+
+}
+
+string Game::getType(string object){
+    if (items.item_exists(object)){
+        return "item";
+    }
+    if (rooms.room_exists(object)){
+        return "room";
+    }
+    if (creatures.creature_exists(object)){
+        return "creature";
+    }
+    if (containers.container_exists(object)){
+        return "container";
+    } else {
+        return "bad";
+    }
+}
+
 void Game::game_over(){
     cout << "Game Over" << endl;
     this->game_running = 0;
-}
-
-// string owner is a room or container name
-void Game::add(string object, string owner){
-    //string type;
-    //if (items.item_exists(object)) type = "item";
-    //if (containers.)
 }
 
 void Game::take(string item_name){
@@ -208,6 +352,17 @@ void Game::read(string item_name){
     }
 }
 
+void Game::turnon(string item_name){
+    if (player_inv.item_exists(item_name)){
+        cout << "You activate the " << item_name << endl;
+        Item* item = player_inv.get_item_by_name(item_name);
+        execute_command(item->getTurnonAction());
+        cout << item->getTurnonPrint() << endl;
+    } else {
+        cout << "You are not carrying " << item_name << endl;
+    }
+}
+
 string Game::get_single_param(string input){
     int space_loc = input.find(" ");
 
@@ -224,8 +379,8 @@ str_tuple Game::get_two_params(string input, string delim){
     if (params == "") return (str_tuple){.param1 = "", .param2 = ""};
     int split = params.find(delim);
 
-    string param1 = params.substr(0, split - 1); 
-    string param2 = params.substr(split + delim.length() + 1, -1);
+    string param1 = params.substr(0, split); 
+    string param2 = params.substr(split + delim.length(), -1);
 
     return (str_tuple){.param1 = param1, .param2 = param2};
 }

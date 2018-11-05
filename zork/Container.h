@@ -9,12 +9,18 @@
 
 class Container : public ItemContainer {
 public:
-    Container();
+    Container(pugi::xml_node, ItemContainer& game_items);
+    Container(const Container&);
     virtual ~Container();
+
+    virtual std::string getName();
+    virtual std::string getStatus();
+    virtual std::string getDesc();
+
+    std::string status;
 
 private:
     std::string name;
-    std::string status;
     std::string description;
 
     std::vector<std::string> accept;

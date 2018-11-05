@@ -11,9 +11,15 @@ public:
     Creature();
     virtual ~Creature();
 
+    virtual std::string getName();
+    virtual std::string getStatus();
+    virtual std::string getDesc();
+    virtual std::string getAttack();
+
+    std::string status;
+
 private:
     std::string name;
-    std::string status;
     std::string description;
     std::string attack;
 

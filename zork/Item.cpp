@@ -16,7 +16,8 @@ Item::Item(pugi::xml_node spec){
         } else if (node_name == "writing"){
             this->writing = node.child_value();
         } else if (node_name == "turnon"){
-
+            this->turnon_action = node.child("action").child_value();
+            this->turnon_print = node.child("print").child_value();
         } else if (node_name == "trigger"){
 
         }
@@ -28,7 +29,10 @@ Item::Item(const Item& item){
     this->status = std::string(item.status);
     this->description = std::string(item.description);
     this->writing = std::string(item.writing);
-    // Add turnon and triggers
+    this->turnon_action = std::string(item.turnon_action);
+    this->turnon_print = std::string(item.turnon_print);
+
+    // Add triggers
 }
 
 Item::~Item(){}
@@ -44,4 +48,10 @@ std::string Item::getDesc(){
 }
 std::string Item::getWriting(){
     return this->writing;
+}
+std::string Item::getTurnonAction(){
+    return this->turnon_action;
+}
+std::string Item::getTurnonPrint(){
+    return this->turnon_print;
 }

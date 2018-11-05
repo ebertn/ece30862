@@ -15,7 +15,7 @@ void ItemContainer::print_items(){
     }
     for (int i = 0; i < this->items.size(); i++){
         if (i == 0){
-            this->items.at(i).getName();
+            std::cout << this->items.at(i).getName();
         } else {
             std::cout << ", " << this->items.at(i).getName();
         }
@@ -38,7 +38,6 @@ Item ItemContainer::remove_item(std::string name){
     items.erase(items.begin() + index); 
 
     return removed;
-    
 }
 
 Item* ItemContainer::get_item_by_name(std::string name){

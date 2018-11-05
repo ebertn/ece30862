@@ -2,7 +2,9 @@
 
 using namespace pugi;
 
-Room::Room(pugi::xml_node spec, ItemContainer& game_items){   
+Room::Room(pugi::xml_node spec, 
+            ItemContainer& game_items, 
+            ContainerContainer& game_containers){   
     this->type = "regular";
 
     for (pugi::xml_node node = spec.first_child(); node; node = node.next_sibling()){
@@ -29,7 +31,10 @@ Room::Room(pugi::xml_node spec, ItemContainer& game_items){
             }
 
         } else if (node_name == "container"){
-            
+            std::cout << "Gets here" << std::endl;
+            Container new_container = Container(*(game_containers.get_container_by_name(node.child_value())));
+            containers.add_container(new_container); 
+            std::cout << "Gets to end" << std::endl;           
         } else if (node_name == "item"){
             Item new_item = Item(*(game_items.get_item_by_name(node.child_value())));
             this->add_item(new_item);
@@ -39,12 +44,13 @@ Room::Room(pugi::xml_node spec, ItemContainer& game_items){
             
         }
     }
-
 }
 
 Room::~Room(){
     //delete this->borders;
 }
+
+
 
 std::string Room::getName(){
     return this->name;

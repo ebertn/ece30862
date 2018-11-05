@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
 #include "pugixml-1.9/src/pugixml.hpp"
 #include "Trigger.h"
 
@@ -16,10 +17,13 @@ public:
     virtual std::string getStatus();
     virtual std::string getDesc();
     virtual std::string getWriting();
+    virtual std::string getTurnonAction();
+    virtual std::string getTurnonPrint();
+
+    std::string status;
 
 private:
     std::string name;
-    std::string status;
     std::string description;
     std::string writing;
     std::string turnon_print;
