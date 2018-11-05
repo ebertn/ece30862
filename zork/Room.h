@@ -21,7 +21,7 @@ struct Borders {
 
 class Room : public ItemContainer {
 public:
-    Room(pugi::xml_node, ItemContainer&, ContainerContainer&);
+    Room(pugi::xml_node, ItemContainer&, ContainerContainer&, CreatureContainer&);
     virtual ~Room();
 
     virtual std::string getName();

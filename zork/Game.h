@@ -50,6 +50,8 @@ protected:
     virtual void turnon(std::string);
     virtual void open(std::string);
     virtual void put(std::string, std::string);
+    virtual void attack(std::string, std::string);
+
 
     virtual void execute_command(std::string);
     virtual void add(std::string, std::string);

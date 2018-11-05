@@ -15,7 +15,7 @@ void CreatureContainer::print_creatures(){
     }
     for (int i = 0; i < this->creatures.size(); i++){
         if (i == 0){
-            this->creatures.at(i).getName();
+            std::cout << this->creatures.at(i).getName();
         } else {
             std::cout << ", " << this->creatures.at(i).getName();
         }

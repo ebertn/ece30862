@@ -10,7 +10,8 @@ Game::~Game(){}
 void Game::start(){ 
     read_xml();
     //print_items();
-    //print_rooms();
+    print_rooms();
+    //cout << "Num creatures: " << creatures.size() << endl;
     //execute_command("Add torch to MainCavern");
     //execute_command("Update torch to MainCavern");
     //execute_command("Delete torch");
@@ -20,10 +21,10 @@ void Game::start(){
     //update("torch", "dog");
     // add("key", "Entrance");
 
-    while(this->game_running) {
-        cout << "> ";
-        handle_input();
-    }
+    // while(this->game_running) {
+    //     cout << "> ";
+    //     handle_input();
+    // }
 }
 
 void Game::read_xml(){
@@ -65,8 +66,10 @@ void Game::print_rooms(){
         cout << "Desc: " << this->rooms.at(i).getDesc() << endl;
         cout << "Items: ";
         this->rooms.at(i).print_items();
-        cout << "Containers:";
+        cout << "Containers: ";
         rooms.at(i).containers.print_containers();
+        cout << "Creatures: ";
+        rooms.at(i).creatures.print_creatures();
         cout << "Borders: " << endl;
         cout << "    n: " << this->rooms.at(i).getBorders().n << endl;
         cout << "    s: " << this->rooms.at(i).getBorders().s << endl;
@@ -91,7 +94,7 @@ void Game::print_items(){
 void Game::create_object(pugi::xml_node spec){
     string obj_name = (string) spec.name();
     if (obj_name == "room"){
-        Room room = Room(spec, this->items, this->containers); 
+        Room room = Room(spec, this->items, this->containers, this->creatures); 
         this->rooms.add_room(room); 
     } else if (obj_name == "item"){
         Item item = Item(spec); 
@@ -100,7 +103,8 @@ void Game::create_object(pugi::xml_node spec){
         Container container = Container(spec, this->items); 
         this->containers.add_container(container);
     } else if (obj_name == "creature"){
-
+        Creature creature = Creature(spec); 
+        this->creatures.add_creature(creature);
     }
 }
 
@@ -337,6 +341,10 @@ void Game::drop(string item_name){
     } else {
         cout << "You are not carrying " << item_name << endl;
     }
+}
+
+void Game::attack(string creature, string item){
+
 }
 
 void Game::print_inv(){

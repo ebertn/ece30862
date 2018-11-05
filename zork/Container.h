@@ -6,6 +6,7 @@
 
 #include "Item.h"
 #include "ItemContainer.h"
+#include "pugixml-1.9/src/pugixml.hpp"
 
 class Container : public ItemContainer {
 public:

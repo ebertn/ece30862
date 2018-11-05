@@ -4,7 +4,8 @@ using namespace pugi;
 
 Room::Room(pugi::xml_node spec, 
             ItemContainer& game_items, 
-            ContainerContainer& game_containers){   
+            ContainerContainer& game_containers,
+            CreatureContainer& game_creatures){   
     this->type = "regular";
 
     for (pugi::xml_node node = spec.first_child(); node; node = node.next_sibling()){
@@ -37,7 +38,8 @@ Room::Room(pugi::xml_node spec,
             Item new_item = Item(*(game_items.get_item_by_name(node.child_value())));
             this->add_item(new_item);
         } else if (node_name == "creature"){
-            
+            Creature new_creature = Creature(*(game_creatures.get_creature_by_name(node.child_value())));
+            this->creatures.add_creature(new_creature);       
         } else if (node_name == "trigger"){
             
         }
