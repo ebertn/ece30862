@@ -6,11 +6,11 @@ SRC=$(wildcard *.cpp)
 OBJ=$(SRC:%.cpp=%.o)
 
 all: $(OBJ)
-	$(Cxx) -o $(BIN) $^
+	$(CXX) -o $(BIN) $^
 
 %.o: %.c
 	$(CXX) $@ -c $<
 
-clean: 
+clean:
 	rm -f *.o
 	rm $(BIN)

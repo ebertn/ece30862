@@ -346,25 +346,25 @@ void Game::drop(string item_name){
 }
 
 void Game::attack(string creature_name, string item){
-    if(!player_inv.item_exists(item)){
-        cout << "You don't have a " << item << endl;
-        return;
-    }
+    // if(!player_inv.item_exists(item)){
+    //     cout << "You don't have a " << item << endl;
+    //     return;
+    // }
 
-    Creature* creature = cur_room->creatures.get_creature_by_name(creature_name);
+    // Creature* creature = cur_room->creatures.get_creature_by_name(creature_name);
 
-    for (int i = 0; i < creature->vulnerabilities.size(); i++){
-        if (creature->vulnerabilities.at(i) == item){
-            for(int j = 0; j < creature->attack.conditions.size(); j++){
-                if (condition_is_true(creature->attack.conditions.at(j))){
-                    for(int k = 0; k < creature->attack.actions.size(); k++){
-                        cout << "You assult the creature with the " << item << endl;
-                        execute_command(creature->attack.actions.at(k));
-                    }
-                }
-            }
-        }
-    }
+    // for (int i = 0; i < creature->vulnerabilities.size(); i++){
+    //     if (creature->vulnerabilities.at(i) == item){
+    //         for(int j = 0; j < creature->attack.conditions.size(); j++){
+    //             if (condition_is_true(creature->attack.conditions.at(j))){
+    //                 for(int k = 0; k < creature->attack.actions.size(); k++){
+    //                     cout << "You assult the creature with the " << item << endl;
+    //                     execute_command(creature->attack.actions.at(k));
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
 }
 
 void Game::print_inv(){
