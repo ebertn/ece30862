@@ -7,6 +7,12 @@
 #include "Trigger.h"
 #include "pugixml-1.9/src/pugixml.hpp"
 
+struct Attack {
+    std::vector<pugi::xml_node> conditions;
+    std::string print;
+    std::vector<std::string> actions;
+};
+
 class Creature {
 public:
     Creature(pugi::xml_node);
@@ -18,13 +24,13 @@ public:
     virtual std::string getDesc();
 
     std::string status;
+    std::vector<std::string> vulnerabilities;
+    Attack attack;
 
 private:
     std::string name;
     std::string description;
-    std::string attack;
 
-    std::vector<std::string> vulnerabilities;
     std::vector<Trigger> triggers;
 };
 

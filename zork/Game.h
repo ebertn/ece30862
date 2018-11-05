@@ -51,7 +51,7 @@ protected:
     virtual void open(std::string);
     virtual void put(std::string, std::string);
     virtual void attack(std::string, std::string);
-
+    virtual bool condition_is_true(pugi::xml_node spec);
 
     virtual void execute_command(std::string);
     virtual void add(std::string, std::string);
@@ -60,7 +60,8 @@ protected:
     virtual std::string getType(std::string);
     virtual void game_over();
     virtual void print_inv();
-
+    
+    static std::string condition_type(pugi::xml_node);
     static std::string get_single_param(std::string);
     static str_tuple get_two_params(std::string, std::string);
 };

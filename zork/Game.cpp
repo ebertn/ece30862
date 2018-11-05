@@ -10,7 +10,7 @@ Game::~Game(){}
 void Game::start(){ 
     read_xml();
     //print_items();
-    print_rooms();
+    //print_rooms();
     //cout << "Num creatures: " << creatures.size() << endl;
     //execute_command("Add torch to MainCavern");
     //execute_command("Update torch to MainCavern");
@@ -21,10 +21,10 @@ void Game::start(){
     //update("torch", "dog");
     // add("key", "Entrance");
 
-    // while(this->game_running) {
-    //     cout << "> ";
-    //     handle_input();
-    // }
+    while(this->game_running) {
+        cout << "> ";
+        handle_input();
+    }
 }
 
 void Game::read_xml(){
@@ -172,8 +172,7 @@ void Game::handle_input(){
         turnon(item);
     } else if (input.substr(0, 7) == ">attack"){
         str_tuple params = get_two_params(input, " with ");
-        cout << "Param1 = " + params.param1 << endl;
-        cout << "Param2 = " + params.param2 << endl;
+        attack(params.param1, params.param2);
     } else {
         cout << "Invalid command" << endl;
     }
@@ -313,6 +312,9 @@ string Game::getType(string object){
     }
     if (containers.container_exists(object)){
         return "container";
+    } 
+    if (object == "inventory") {
+        return "inventory";
     } else {
         return "bad";
     }
@@ -343,8 +345,26 @@ void Game::drop(string item_name){
     }
 }
 
-void Game::attack(string creature, string item){
+void Game::attack(string creature_name, string item){
+    if(!player_inv.item_exists(item)){
+        cout << "You don't have a " << item << endl;
+        return;
+    }
 
+    Creature* creature = cur_room->creatures.get_creature_by_name(creature_name);
+
+    for (int i = 0; i < creature->vulnerabilities.size(); i++){
+        if (creature->vulnerabilities.at(i) == item){
+            for(int j = 0; j < creature->attack.conditions.size(); j++){
+                if (condition_is_true(creature->attack.conditions.at(j))){
+                    for(int k = 0; k < creature->attack.actions.size(); k++){
+                        cout << "You assult the creature with the " << item << endl;
+                        execute_command(creature->attack.actions.at(k));
+                    }
+                }
+            }
+        }
+    }
 }
 
 void Game::print_inv(){
@@ -406,6 +426,83 @@ void Game::put(string item_name, string container_name){
 
     } else {
         cout << "You are not carrying " << item_name << endl;
+    }
+}
+
+string Game::condition_type(pugi::xml_node spec){
+    if (spec.child_value("has") == "") {
+        return "owner";
+    } else {
+        return "status";
+    }
+}
+
+bool Game::condition_is_true(pugi::xml_node spec){
+    string type = condition_type(spec); 
+
+    if (type == "owner"){
+        string owner = spec.child_value("owner");
+        string object = spec.child_value("object");
+        string has = spec.child_value("has");
+
+        string owner_type = getType(owner);
+        string object_type = getType(object);
+
+        if (owner_type == "container"){
+            if (!cur_room->containers.container_exists(object)) return false;
+            Container* container = cur_room->containers.get_container_by_name(owner);
+            bool has_it = container->item_exists(object);
+
+            return !(has_it ^ (has == "yes"));
+        } else if (owner_type == "room"){
+            if (owner_type != cur_room->getName()) return false;
+            Room* room = cur_room;
+            bool has_it;
+            if (object_type == "item"){
+                has_it = room->item_exists(object);
+                for (int i = 0; i < room->containers.size(); i++){
+                    has_it |= room->containers.at(i).item_exists(object);
+                }
+            } else if (object_type == "container"){
+                has_it = room->containers.container_exists(object);
+            } else if (object_type == "creature"){
+                has_it = room->creatures.creature_exists(object);
+            }
+            return !(has_it ^ (has == "yes"));
+        } else if(owner_type == "inventory"){
+            bool has_it = player_inv.item_exists(object);
+
+            return !(has_it ^ (has == "yes"));
+        }
+    } else {
+        string object = spec.child_value("object");
+        string status = spec.child_value("status");
+
+        string object_type = getType(object);
+        
+        if (object_type == "item"){
+            if(cur_room->item_exists(object)){
+                if (cur_room->get_item_by_name(object)->status == status){
+                    return true;
+                }
+            }
+
+            for (int i = 0; i < cur_room->containers.size(); i++){
+                if (cur_room->containers.at(i).item_exists(object)){
+                    return true;
+                }
+            }
+        } else if (object_type == "room"){
+            return cur_room->status == status;
+        } else if (object_type == "container"){
+            if(cur_room->containers.container_exists(object)){
+                return cur_room->containers.get_container_by_name(object)->status == status;
+            }            
+        } else if (object_type == "creature"){
+            if(cur_room->creatures.creature_exists(object)){
+                return cur_room->creatures.get_creature_by_name(object)->status == status;
+            } 
+        }
     }
 }
 
