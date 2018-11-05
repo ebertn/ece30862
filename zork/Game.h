@@ -48,6 +48,9 @@ protected:
     virtual void drop(std::string);
     virtual void read(std::string);
     virtual void turnon(std::string);
+    virtual void open(std::string);
+    virtual void put(std::string, std::string);
+
     virtual void execute_command(std::string);
     virtual void add(std::string, std::string);
     virtual void delete_obj(std::string);

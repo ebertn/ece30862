@@ -18,12 +18,12 @@ public:
     virtual std::string getDesc();
 
     std::string status;
+    std::vector<std::string> accept;
 
 private:
     std::string name;
     std::string description;
 
-    std::vector<std::string> accept;
     std::vector<Trigger> triggers;
 };
 

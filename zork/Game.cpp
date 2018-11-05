@@ -10,11 +10,11 @@ Game::~Game(){}
 void Game::start(){ 
     read_xml();
     //print_items();
-    print_rooms();
+    //print_rooms();
     //execute_command("Add torch to MainCavern");
     //execute_command("Update torch to MainCavern");
     //execute_command("Delete torch");
-    //enter_room("Entrance");
+    enter_room("Entrance");
     //execute_command("Delete MainCavern");
     //delete_obj("torch");
     //update("torch", "dog");
@@ -153,7 +153,7 @@ void Game::handle_input(){
         }
     } else if (input.substr(0, 4) == "open"){
         string container = get_single_param(input);
-        cout << container << endl;
+        open(container);
     } else if (input.substr(0, 4) == "read"){
         string item = get_single_param(input);
         read(item);
@@ -162,8 +162,7 @@ void Game::handle_input(){
         drop(item);
     } else if (input.substr(0, 3) == "put"){
         str_tuple params = get_two_params(input, " in ");
-        cout << "Param1 = " + params.param1 << endl;
-        cout << "Param2 = " + params.param2 << endl;
+        put(params.param1, params.param2);
     } else if (input.substr(0, 7) == "turn on"){
         string item = get_single_param(input.substr(5, -1));
         turnon(item);
@@ -324,6 +323,7 @@ void Game::take(string item_name){
     if (cur_room->item_exists(item_name)){
         Item removed = cur_room->remove_item(item_name);
         player_inv.add_item(removed);
+        cout << "Item " << item_name << " added to inventory." << endl;
     } else {
         cout << "There is no " << item_name << " in this room." << endl;
     }
@@ -333,6 +333,7 @@ void Game::drop(string item_name){
     if (player_inv.item_exists(item_name)){
         Item removed = player_inv.remove_item(item_name);
         cur_room->add_item(removed);
+        cout << item_name << " dropped." << endl;
     } else {
         cout << "You are not carrying " << item_name << endl;
     }
@@ -358,6 +359,43 @@ void Game::turnon(string item_name){
         Item* item = player_inv.get_item_by_name(item_name);
         execute_command(item->getTurnonAction());
         cout << item->getTurnonPrint() << endl;
+    } else {
+        cout << "You are not carrying " << item_name << endl;
+    }
+}
+
+void Game::open(std::string container_name){
+    if(cur_room->containers.container_exists(container_name)){
+        Container* container = containers.get_container_by_name(container_name);
+        if (container->size() > 0){
+            cout << container_name << " contains ";
+            container->print_items();
+
+            for (int i = 0; i < container->size(); i++){
+                Item removed = container->remove_item(container->at(i).getName());
+                cur_room->add_item(removed);
+            }
+        } else {
+            cout << container_name << " is empty" << endl;
+        }
+    } else {    
+        cout << "There is no container " << container_name << endl;
+    }
+}
+
+void Game::put(string item_name, string container_name){
+    if(player_inv.item_exists(item_name)){
+        Container* container = containers.get_container_by_name(container_name);
+        for (int i = 0; i < container->accept.size(); i++){
+            if (item_name == container->accept.at(i)){
+                Item removed = player_inv.remove_item(item_name);
+                container->add_item(removed);
+                cout << "Item " << item_name << " added to " << container_name << endl;
+                return;
+            }
+        }
+        cout << item_name << " cannot be put into " << container_name << endl;
+
     } else {
         cout << "You are not carrying " << item_name << endl;
     }

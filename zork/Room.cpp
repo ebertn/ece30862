@@ -31,10 +31,8 @@ Room::Room(pugi::xml_node spec,
             }
 
         } else if (node_name == "container"){
-            std::cout << "Gets here" << std::endl;
             Container new_container = Container(*(game_containers.get_container_by_name(node.child_value())));
-            containers.add_container(new_container); 
-            std::cout << "Gets to end" << std::endl;           
+            containers.add_container(new_container);          
         } else if (node_name == "item"){
             Item new_item = Item(*(game_items.get_item_by_name(node.child_value())));
             this->add_item(new_item);
