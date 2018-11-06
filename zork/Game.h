@@ -37,7 +37,7 @@ protected:
     Room* cur_room;
 
     virtual void read_xml();
-    virtual void handle_input();
+    virtual void handle_input(std::string);
     virtual void create_object(pugi::xml_node);
     virtual void print_rooms();
     virtual void print_items();
@@ -51,6 +51,8 @@ protected:
     virtual void open(std::string);
     virtual void put(std::string, std::string);
     virtual void attack(std::string, std::string);
+    virtual bool check_triggers(std::string);
+    virtual void do_prints_actions(std::vector<std::string>*);
     virtual bool condition_is_true(pugi::xml_node spec);
 
     virtual void execute_command(std::string);

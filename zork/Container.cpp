@@ -1,5 +1,7 @@
 #include "Container.h"
 
+using namespace std;
+
 Container::Container(pugi::xml_node spec, ItemContainer& game_items){
     this->status = "none";
     for (pugi::xml_node node = spec.first_child(); node; node = node.next_sibling()){
@@ -18,7 +20,8 @@ Container::Container(pugi::xml_node spec, ItemContainer& game_items){
             std::string accept_item = node.child_value();
             this->accept.push_back(accept_item);
         } else if (node_name == "trigger"){
-
+            Trigger trigger = Trigger(node);
+            this->triggers.push_back(trigger);
         }
     }
 }
@@ -37,7 +40,10 @@ Container::Container(const Container& container){
         this->accept.push_back(container.accept.at(i));
     }
 
-    // Add triggers and accept
+    for(int i = 0; i < container.triggers.size(); i++){
+        Trigger trigger = container.triggers.at(i);
+        this->triggers.push_back(trigger);
+    }
 }
 
 Container::~Container(){}

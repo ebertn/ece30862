@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
 
 #include "Trigger.h"
 #include "pugixml-1.9/src/pugixml.hpp"
@@ -26,12 +27,12 @@ public:
     std::string status;
     std::vector<std::string> vulnerabilities;
     Attack attack;
+    std::vector<Trigger> triggers;
+
 
 private:
     std::string name;
     std::string description;
-
-    std::vector<Trigger> triggers;
 };
 
 #endif

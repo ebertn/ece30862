@@ -3,19 +3,20 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
+#include "pugixml-1.9/src/pugixml.hpp"
 
 class Trigger {
 public:
-    Trigger();
+    Trigger(pugi::xml_node);
+    Trigger(const Trigger&);
     virtual ~Trigger();
 
-private:
-    std::string type;
     std::string command;
+    std::string type;
 
-    std::vector<std::string> print;
-    std::vector<std::string> action;
-    std::vector<std::string> conditions;
+    std::vector<std::string> print_actions;
+    std::vector<pugi::xml_node> conditions;
 };
 
 #endif

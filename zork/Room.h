@@ -34,13 +34,12 @@ public:
     Borders borders; // 0 = n, 1 = s, 2 = e, 3 = w
 
     std::string status;
+    std::vector<Trigger> triggers;    
 
 private: 
     std::string name;
     std::string type;
     std::string description;
-    
-        //std::vector<Trigger> triggers;    
 };
 
 

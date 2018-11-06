@@ -19,7 +19,8 @@ Item::Item(pugi::xml_node spec){
             this->turnon_action = node.child("action").child_value();
             this->turnon_print = node.child("print").child_value();
         } else if (node_name == "trigger"){
-
+            Trigger trigger = Trigger(node);
+            this->triggers.push_back(trigger);
         }
     }
 }
@@ -32,7 +33,10 @@ Item::Item(const Item& item){
     this->turnon_action = std::string(item.turnon_action);
     this->turnon_print = std::string(item.turnon_print);
 
-    // Add triggers
+    for(int i = 0; i < item.triggers.size(); i++){
+        Trigger trigger = item.triggers.at(i);
+        this->triggers.push_back(trigger);
+    }
 }
 
 Item::~Item(){}

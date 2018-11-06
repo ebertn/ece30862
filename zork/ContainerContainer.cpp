@@ -1,5 +1,7 @@
 #include "ContainerContainer.h"
 
+using namespace std;
+
 ContainerContainer::ContainerContainer() {}
 
 ContainerContainer::~ContainerContainer() {}

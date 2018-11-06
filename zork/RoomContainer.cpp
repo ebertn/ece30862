@@ -1,5 +1,7 @@
 #include "RoomContainer.h"
 
+using namespace std;
+
 RoomContainer::RoomContainer() {}
 
 RoomContainer::~RoomContainer() {}

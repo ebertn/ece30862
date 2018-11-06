@@ -1,5 +1,5 @@
 CXX=g++
-CXXFLAGS=-g -std=c++0x -Wall -pedantic
+CXXFLAGS=-g -std=c++0x 
 BIN=zork
 
 SRC=$(wildcard *.cpp)

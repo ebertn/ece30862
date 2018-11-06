@@ -21,15 +21,14 @@ public:
     virtual std::string getTurnonPrint();
 
     std::string status;
+    std::vector<Trigger> triggers; 
 
 private:
     std::string name;
     std::string description;
     std::string writing;
     std::string turnon_print;
-    std::string turnon_action;
-    
-    std::vector<Trigger> triggers;   
+    std::string turnon_action;  
 };
 
 #endif

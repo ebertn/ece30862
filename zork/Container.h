@@ -20,12 +20,11 @@ public:
 
     std::string status;
     std::vector<std::string> accept;
+    std::vector<Trigger> triggers;
 
 private:
     std::string name;
     std::string description;
-
-    std::vector<Trigger> triggers;
 };
 
 #endif

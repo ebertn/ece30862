@@ -41,7 +41,8 @@ Room::Room(pugi::xml_node spec,
             Creature new_creature = Creature(*(game_creatures.get_creature_by_name(node.child_value())));
             this->creatures.add_creature(new_creature);       
         } else if (node_name == "trigger"){
-            
+            Trigger trigger = Trigger(node);
+            this->triggers.push_back(trigger); 
         }
     }
 }
