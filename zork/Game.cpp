@@ -16,7 +16,6 @@ void Game::start(){
     //execute_command("Update torch to MainCavern");
     //execute_command("Delete torch");
     enter_room("Entrance");
-    handle_input("n");
     //execute_command("Delete MainCavern");
     //delete_obj("torch");
     //update("torch", "dog");
@@ -140,14 +139,12 @@ Room* Game::get_room_by_name(std::string name){
 
 void Game::handle_input(string cmd){
     string input = cmd;
-    cout << "> ";
     if(cmd.empty()){
         getline(cin, input);
-    } else {
-        cout << input << endl;
     }
 
     if (check_triggers(input)){
+        //cout << "There were Triggers" << endl;
         return;
     }
 
@@ -179,7 +176,7 @@ void Game::handle_input(string cmd){
     } else if (input.substr(0, 7) == "turn on"){
         string item = get_single_param(input.substr(5, -1));
         turnon(item);
-    } else if (input.substr(0, 7) == ">attack"){
+    } else if (input.substr(0, 6) == "attack"){
         str_tuple params = get_two_params(input, " with ");
         if (params.param1 != ""){
             attack(params.param1, params.param2);
@@ -188,7 +185,7 @@ void Game::handle_input(string cmd){
         cout << "Invalid command" << endl;
     }
 
-    if (check_triggers(input)){
+    if (check_triggers("")){
         return;
     }
 }
@@ -522,6 +519,7 @@ bool Game::check_triggers(string cmd){
 
     for (int j = 0; j < cur_room->triggers.size(); j++){
         Trigger& trigger = cur_room->triggers.at(j);
+        //cout << trigger.print_actions.at(j) << endl;;
         if (trigger.command == "" || trigger.command == cmd){
             bool triggered = false;
             for (int k = 0; k < trigger.conditions.size(); k++){
@@ -618,28 +616,44 @@ void Game::put(string item_name, string container_name){
 }
 
 string Game::condition_type(pugi::xml_node spec){
-    if (spec.child_value("has") == "") {
-        return "owner";
-    } else {
+    string has = spec.child_value("has");
+    if (has.empty()) {
+        //cout << "status" << endl;
         return "status";
+    } else {
+        //cout << "owner" << endl;
+        return "owner";
     }
 }
 
 bool Game::condition_is_true(pugi::xml_node spec){
     string type = condition_type(spec); 
+    // cout << "---------------cond_is_true open-------------------" << endl;
+    // cout << "Type: " << type << endl;
 
     if (type == "owner"){
         string owner = spec.child_value("owner");
         string object = spec.child_value("object");
         string has = spec.child_value("has");
 
+        cout << "Owner: " << owner << endl;
+        cout << "Object: " << object << endl;
+        // cout << "Has: " << has << endl;
+
         string owner_type = getType(owner);
         string object_type = getType(object);
 
+        // cout << "Owner type: " << owner_type << endl;
+
         if (owner_type == "container"){
-            if (!cur_room->containers.container_exists(object)) return false;
+            if (!cur_room->containers.container_exists(owner)){
+                cout << "Fuck" << endl;
+                return false;
+            }
             Container* container = cur_room->containers.get_container_by_name(owner);
             bool has_it = container->item_exists(object);
+
+            cout << "---Has it: " << has_it << endl;
 
             return !(has_it ^ (has == "yes"));
         } else if (owner_type == "room"){
@@ -658,6 +672,7 @@ bool Game::condition_is_true(pugi::xml_node spec){
             }
             return !(has_it ^ (has == "yes"));
         } else if(owner_type == "inventory"){
+            //cout << "Check goes here ---------------------------------" << endl;
             bool has_it = player_inv.item_exists(object);
 
             return !(has_it ^ (has == "yes"));
@@ -700,6 +715,7 @@ bool Game::condition_is_true(pugi::xml_node spec){
             } 
         }
     }
+
     return false;
 }
 
