@@ -34,7 +34,7 @@ Item::Item(const Item& item){
     this->turnon_print = std::string(item.turnon_print);
 
     for(int i = 0; i < item.triggers.size(); i++){
-        Trigger trigger = item.triggers.at(i);
+        Trigger trigger = Trigger(item.triggers.at(i));
         this->triggers.push_back(trigger);
     }
 }

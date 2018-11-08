@@ -28,6 +28,7 @@ public:
     virtual std::string getDesc();
     virtual Borders getBorders();
     virtual std::string getType();
+    virtual void print_room();
 
     ContainerContainer containers;
     CreatureContainer creatures;

@@ -1,6 +1,6 @@
 CXX=g++
-CXXFLAGS=-g -std=c++0x 
-BIN=zork
+CXXFLAGS=-g -std=c++0x
+BIN=zork.out
 
 SRC=$(wildcard *.cpp)
 OBJ=$(SRC:%.cpp=%.o)

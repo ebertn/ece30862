@@ -9,22 +9,14 @@
 
 using namespace std;
 
-int main (){
-    // ItemContainer items;
-
-    // for (int i = 0; i < 500; i++){
-    //     //std::string name = "Item ";
-    //     Item a = Item("Item " + std::to_string(i));
-    //     items.add(a);
-    // }
-
-    // items.print();
-
-    // while(1){
-    //     Game game("hello");
-    //     game.start();
-    // }
-
-    Game game("./xml_files/sample.txt.xml");
+int main (int argc, char** argv){
+    if (argc != 2){
+        cout << "Wrong number of arguments" << endl;
+        return EXIT_FAILURE;
+    }
+    
+    Game game(argv[1]);
     game.start();
+
+    return EXIT_SUCCESS;
 }

@@ -4,6 +4,7 @@ using namespace std;
 
 Trigger::Trigger(pugi::xml_node spec) {
     this->command = "";
+    this->type = "single";
     for (pugi::xml_node node = spec.first_child(); node; node = node.next_sibling()){
         std::string node_name = node.name();
 
@@ -29,7 +30,9 @@ Trigger::Trigger(const Trigger& trigger){
     this->command = std::string(trigger.command);
 
     for(int i = 0; i < trigger.conditions.size(); i++){
-        this->conditions.push_back(trigger.conditions.at(i)); 
+        pugi::xml_node copy = pugi::xml_node(trigger.conditions.at(i));
+        this->conditions.push_back(copy); 
+        // this->conditions.push_back(trigger.conditions.at(i)); 
     }
 
     for(int i = 0; i < trigger.print_actions.size(); i++){

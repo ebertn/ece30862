@@ -9,22 +9,62 @@ Game::~Game(){}
 
 void Game::start(){ 
     read_xml();
-    //print_items();
-    //print_rooms();
-    //cout << "Num creatures: " << creatures.size() << endl;
-    //execute_command("Add torch to MainCavern");
-    //execute_command("Update torch to MainCavern");
-    //execute_command("Delete torch");
     enter_room("Entrance");
-    //execute_command("Delete MainCavern");
-    //delete_obj("torch");
-    //update("torch", "dog");
-    // add("key", "Entrance");
 
     while(this->game_running) {
         handle_input("");
         
     }
+}
+
+void Game::handle_input(string cmd){
+    string input = cmd;
+    if(cmd.empty()){
+        getline(cin, input);
+    }
+
+    if (check_triggers(input)){
+        return;
+    }
+
+    if (input == "n" || input == "s" || input == "e" || input == "w"){
+        move(input);
+    } else if (input == "i"){
+        print_inv();
+    } else if (input.substr(0, 4) == "take"){
+        string item = get_single_param(input);
+        take(item);
+    } else if (input == "open exit"){
+        if (this->cur_room->getType() == "exit"){
+            game_over();
+        } else {
+            cout << "This room is not an exit" << endl;
+        }
+    } else if (input.substr(0, 4) == "open"){
+        string container = get_single_param(input);
+        open(container);
+    } else if (input.substr(0, 4) == "read"){
+        string item = get_single_param(input);
+        read(item);
+    } else if (input.substr(0, 4) == "drop"){
+        string item = get_single_param(input);
+        drop(item);
+    } else if (input.substr(0, 3) == "put"){
+        str_tuple params = get_two_params(input, " in ");
+        put(params.param1, params.param2);
+    } else if (input.substr(0, 7) == "turn on"){
+        string item = get_single_param(input.substr(5, -1));
+        turnon(item);
+    } else if (input.substr(0, 6) == "attack"){
+        str_tuple params = get_two_params(input, " with ");
+        if (params.param1 != ""){
+            attack(params.param1, params.param2);
+        }
+    } else {
+        cout << "Invalid command" << endl;
+    }
+
+    check_triggers("");
 }
 
 void Game::read_xml(){
@@ -62,20 +102,7 @@ void Game::read_xml(){
 
 void Game::print_rooms(){
     for (int i = 0; i < this->rooms.size(); i++){
-        cout << "Name: " << this->rooms.at(i).getName() << endl;
-        cout << "Desc: " << this->rooms.at(i).getDesc() << endl;
-        cout << "Items: ";
-        this->rooms.at(i).print_items();
-        cout << "Containers: ";
-        rooms.at(i).containers.print_containers();
-        cout << "Creatures: ";
-        rooms.at(i).creatures.print_creatures();
-        cout << "Borders: " << endl;
-        cout << "    n: " << this->rooms.at(i).getBorders().n << endl;
-        cout << "    s: " << this->rooms.at(i).getBorders().s << endl;
-        cout << "    e: " << this->rooms.at(i).getBorders().e << endl;
-        cout << "    w: " << this->rooms.at(i).getBorders().w << endl;
-        cout << endl;
+        this->rooms.at(i).print_room();
     }
 }
 
@@ -135,59 +162,6 @@ Room* Game::get_room_by_name(std::string name){
         }
     }
     return NULL;
-}
-
-void Game::handle_input(string cmd){
-    string input = cmd;
-    if(cmd.empty()){
-        getline(cin, input);
-    }
-
-    if (check_triggers(input)){
-        //cout << "There were Triggers" << endl;
-        return;
-    }
-
-    if (input == "n" || input == "s" || input == "e" || input == "w"){
-        move(input);
-    } else if (input == "i"){
-        print_inv();
-    } else if (input.substr(0, 4) == "take"){
-        string item = get_single_param(input);
-        take(item);
-    } else if (input == "open exit"){
-        if (this->cur_room->getType() == "exit"){
-            game_over();
-        } else {
-            cout << "This room is not an exit" << endl;
-        }
-    } else if (input.substr(0, 4) == "open"){
-        string container = get_single_param(input);
-        open(container);
-    } else if (input.substr(0, 4) == "read"){
-        string item = get_single_param(input);
-        read(item);
-    } else if (input.substr(0, 4) == "drop"){
-        string item = get_single_param(input);
-        drop(item);
-    } else if (input.substr(0, 3) == "put"){
-        str_tuple params = get_two_params(input, " in ");
-        put(params.param1, params.param2);
-    } else if (input.substr(0, 7) == "turn on"){
-        string item = get_single_param(input.substr(5, -1));
-        turnon(item);
-    } else if (input.substr(0, 6) == "attack"){
-        str_tuple params = get_two_params(input, " with ");
-        if (params.param1 != ""){
-            attack(params.param1, params.param2);
-        }
-    } else {
-        cout << "Invalid command" << endl;
-    }
-
-    if (check_triggers("")){
-        return;
-    }
 }
 
 void Game::execute_command(string cmd){
@@ -282,7 +256,6 @@ void Game::update(string object, string status){
     if (type == "item"){
         for (int i = 0; i < rooms.size(); i++){
             if(rooms.at(i).item_exists(object)){
-                //rooms.at(i).remove_item(object);
                 rooms.at(i).get_item_by_name(object)->status = status;
             } else if (player_inv.item_exists(object)){
                 player_inv.get_item_by_name(object)->status = status;          
@@ -291,7 +264,6 @@ void Game::update(string object, string status){
     } else if (type == "creature"){
         for (int i = 0; i < rooms.size(); i++){
             if(rooms.at(i).creatures.creature_exists(object)){
-                //rooms.at(i).creatures.remove_creature(object);
                 rooms.at(i).creatures.get_creature_by_name(object)->status = status;
 
             }
@@ -299,14 +271,12 @@ void Game::update(string object, string status){
     } else if (type == "container"){
         for (int i = 0; i < rooms.size(); i++){
             if(rooms.at(i).containers.container_exists(object)){
-                // rooms.at(i).containers.remove_container(object);
                 rooms.at(i).containers.get_container_by_name(object)->status = status;
             }
         }
     } else if (type == "room"){
         if (rooms.get_room_by_name(object)->getName() != cur_room->getName()){
             if(rooms.room_exists(object)){
-                // rooms.remove_room(object);
                 rooms.get_room_by_name(object)->status = status;
             }
         }
@@ -339,7 +309,7 @@ void Game::game_over(){
     this->game_running = 0;
 }
 
-void Game::take(string item_name){
+void Game::take(string item_name){ 
     if (cur_room->item_exists(item_name)){
         Item removed = cur_room->remove_item(item_name);
         player_inv.add_item(removed);
@@ -380,19 +350,19 @@ void Game::attack(string creature_name, string item){
                 bool cond = condition_is_true(creature->attack.conditions.at(j));
 
                 if(!cond){
-                    cout << "Nothing happened." << endl;
+                    cout << "Nothing happened1." << endl;
                     return;
                 } 
-                for(int k = 0; k < creature->attack.actions.size(); k++){
-                    execute_command(creature->attack.actions.at(k));
-                }
-                cout << "You assult the creature with the " << item << endl;
-                cout << creature->attack.print << endl;
-                return;
             }
+            for(int k = 0; k < creature->attack.actions.size(); k++){
+                execute_command(creature->attack.actions.at(k));
+            }
+            cout << "You assult the creature with the " << item << endl;
+            cout << creature->attack.print << endl;
+            return;
         }
     }
-    cout << "Nothing happened." << endl;
+    cout << "Nothing happened2." << endl;
 }
 
 bool Game::check_triggers(string cmd){
@@ -413,9 +383,10 @@ bool Game::check_triggers(string cmd){
 
                 if (triggered){
                     any_triggered = true;
-                    do_prints_actions(&trigger.print_actions);
+                    Trigger trig_copy = Trigger(trigger);
                     if (trigger.type == "single")
                             item.triggers.erase(item.triggers.begin() + j);
+                    do_prints_actions(&trig_copy.print_actions);
                     check_triggers("");
                 }
             }
@@ -437,9 +408,10 @@ bool Game::check_triggers(string cmd){
 
                 if (triggered){
                     any_triggered = true;
-                    do_prints_actions(&trigger.print_actions);
+                    Trigger trig_copy = Trigger(trigger);
                     if (trigger.type == "single")
                             item.triggers.erase(item.triggers.begin() + j);
+                    do_prints_actions(&trig_copy.print_actions);
                     check_triggers("");
                 }
             }
@@ -461,9 +433,11 @@ bool Game::check_triggers(string cmd){
 
                 if (triggered){
                     any_triggered = true;
-                    do_prints_actions(&trigger.print_actions);
-                    if (trigger.type == "single")
+                    Trigger trig_copy = Trigger(trigger);
+                    if (trigger.type == "single"){
                             container.triggers.erase(container.triggers.begin() + j);
+                    }
+                    do_prints_actions(&trig_copy.print_actions);
                     check_triggers("");
                 }
             }
@@ -483,9 +457,10 @@ bool Game::check_triggers(string cmd){
 
                     if (triggered){
                         any_triggered = true;
-                        do_prints_actions(&trigger.print_actions);
+                        Trigger trig_copy = Trigger(trigger);
                         if (trigger.type == "single")
-                                item.triggers.erase(item.triggers.begin() + j);
+                            item.triggers.erase(item.triggers.begin() + j);
+                        do_prints_actions(&trig_copy.print_actions);
                         check_triggers("");
                     }
                 }
@@ -508,9 +483,10 @@ bool Game::check_triggers(string cmd){
 
                 if (triggered){
                     any_triggered = true;
-                    do_prints_actions(&trigger.print_actions);
+                    Trigger trig_copy = Trigger(trigger);
                     if (trigger.type == "single")
                             creature.triggers.erase(creature.triggers.begin() + j);
+                    do_prints_actions(&trig_copy.print_actions);
                     check_triggers("");
                 }
             }
@@ -519,7 +495,6 @@ bool Game::check_triggers(string cmd){
 
     for (int j = 0; j < cur_room->triggers.size(); j++){
         Trigger& trigger = cur_room->triggers.at(j);
-        //cout << trigger.print_actions.at(j) << endl;;
         if (trigger.command == "" || trigger.command == cmd){
             bool triggered = false;
             for (int k = 0; k < trigger.conditions.size(); k++){
@@ -530,9 +505,10 @@ bool Game::check_triggers(string cmd){
 
             if (triggered){
                 any_triggered = true;
-                do_prints_actions(&trigger.print_actions);
+                Trigger trig_copy = Trigger(trigger);
                 if (trigger.type == "single")
                         cur_room->triggers.erase(cur_room->triggers.begin() + j);
+                do_prints_actions(&trig_copy.print_actions);
                 check_triggers("");
             }
         }
@@ -580,7 +556,7 @@ void Game::turnon(string item_name){
 
 void Game::open(std::string container_name){
     if(cur_room->containers.container_exists(container_name)){
-        Container* container = containers.get_container_by_name(container_name);
+        Container* container = cur_room->containers.get_container_by_name(container_name);
         if (container->size() > 0){
             cout << container_name << " contains ";
             container->print_items();
@@ -599,12 +575,11 @@ void Game::open(std::string container_name){
 
 void Game::put(string item_name, string container_name){
     if(player_inv.item_exists(item_name)){
-        Container* container = containers.get_container_by_name(container_name);
+        Container* container = cur_room->containers.get_container_by_name(container_name);
         for (int i = 0; i < container->accept.size(); i++){
             if (item_name == container->accept.at(i)){
                 Item removed = player_inv.remove_item(item_name);
                 container->add_item(removed);
-                cout << "Item " << item_name << " added to " << container_name << endl;
                 return;
             }
         }
@@ -618,42 +593,29 @@ void Game::put(string item_name, string container_name){
 string Game::condition_type(pugi::xml_node spec){
     string has = spec.child_value("has");
     if (has.empty()) {
-        //cout << "status" << endl;
         return "status";
     } else {
-        //cout << "owner" << endl;
         return "owner";
     }
 }
 
 bool Game::condition_is_true(pugi::xml_node spec){
     string type = condition_type(spec); 
-    // cout << "---------------cond_is_true open-------------------" << endl;
-    // cout << "Type: " << type << endl;
 
     if (type == "owner"){
         string owner = spec.child_value("owner");
         string object = spec.child_value("object");
         string has = spec.child_value("has");
 
-        cout << "Owner: " << owner << endl;
-        cout << "Object: " << object << endl;
-        // cout << "Has: " << has << endl;
-
         string owner_type = getType(owner);
         string object_type = getType(object);
 
-        // cout << "Owner type: " << owner_type << endl;
-
         if (owner_type == "container"){
             if (!cur_room->containers.container_exists(owner)){
-                cout << "Fuck" << endl;
                 return false;
             }
             Container* container = cur_room->containers.get_container_by_name(owner);
             bool has_it = container->item_exists(object);
-
-            cout << "---Has it: " << has_it << endl;
 
             return !(has_it ^ (has == "yes"));
         } else if (owner_type == "room"){
@@ -672,12 +634,11 @@ bool Game::condition_is_true(pugi::xml_node spec){
             }
             return !(has_it ^ (has == "yes"));
         } else if(owner_type == "inventory"){
-            //cout << "Check goes here ---------------------------------" << endl;
             bool has_it = player_inv.item_exists(object);
 
             return !(has_it ^ (has == "yes"));
-        }
-    } else { // Status type
+        } 
+    } else if (type == "status"){ // Status type
         string object = spec.child_value("object");
         string status = spec.child_value("status");
 

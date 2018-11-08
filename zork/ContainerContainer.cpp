@@ -15,13 +15,22 @@ void ContainerContainer::print_containers(){
         std::cout << " empty" << std::endl;
         return;
     }
+
     for (int i = 0; i < this->containers.size(); i++){
-        if (i == 0){
-            std::cout << this->containers.at(i).getName();
+        std::cout << std::endl << "    - " << this->containers.at(i).getName() << endl;
+        std::cout << "        - Items: " << endl;
+        std::cout << "            - ";
+        this->containers.at(i).print_items();
+        std::cout << "        - Triggers object: " << endl;
+        if (this->containers.at(i).triggers.size() > 0){
+            std::cout << "            - ";
+            cout << this->containers.at(i).triggers.at(0).conditions.at(0).child_value("object") << endl;
         } else {
-            std::cout << ", " << this->containers.at(i).getName();
+            std::cout << "            - ";
+            cout << "None" << endl;
         }
     }
+
     std::cout << std::endl;
 }
 

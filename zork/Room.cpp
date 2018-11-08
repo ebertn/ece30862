@@ -1,6 +1,7 @@
 #include "Room.h" 
 
 using namespace pugi;
+using namespace std;
 
 Room::Room(pugi::xml_node spec, 
             ItemContainer& game_items, 
@@ -51,7 +52,23 @@ Room::~Room(){
     //delete this->borders;
 }
 
-
+void Room::print_room(){
+    cout << "---------------------------------------" << endl;
+    cout << "Name: " << this->getName() << endl;
+    cout << "Desc: " << this->getDesc() << endl;
+    cout << "Items: ";
+    this->print_items();
+    cout << "Containers: ";
+    this->containers.print_containers();
+    cout << "Creatures: ";
+    this->creatures.print_creatures();
+    cout << "Borders: " << endl;
+    cout << "    n: " << this->getBorders().n << endl;
+    cout << "    s: " << this->getBorders().s << endl;
+    cout << "    e: " << this->getBorders().e << endl;
+    cout << "    w: " << this->getBorders().w << endl;
+    cout << endl;
+}
 
 std::string Room::getName(){
     return this->name;
