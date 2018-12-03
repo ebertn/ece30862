@@ -37,3 +37,4 @@
 
 # Other (test files)
 test.cpp
+*.zip

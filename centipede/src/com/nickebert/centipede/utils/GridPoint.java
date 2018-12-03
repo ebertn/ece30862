@@ -7,4 +7,9 @@ public class GridPoint {
         this.row = row;
         this.col = col;
     }
+
+    public GridPoint(GridPoint gp){
+        this.row = gp.row;
+        this.col = gp.col;
+    }
 }

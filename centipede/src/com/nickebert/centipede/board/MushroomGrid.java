@@ -23,13 +23,15 @@ public class MushroomGrid {
     public static int numRows;
     public static int numCols;
 
-    private float mushChance = 0.1f;
+    private final float mushChance = 0.4f;
+    public final static int playerAreaSize = 6;
+    public final static int centipedeAreaSize = 1;
 
     public MushroomGrid(ArrayList<Bullet> bullets){
         this.bullets = bullets;
 
         winWidth = Window.game_width;
-        winHeight = (int) (Window.game_height * 0.8);
+        winHeight = (int) (Window.game_height);
 
         mushSideLen = 2 * Mushroom.rad;
 
@@ -71,8 +73,10 @@ public class MushroomGrid {
 
     private void generateGrid(){
         for(int col = 1; col < numCols; col++){
-            for(int row = 0; row < numRows; row++){
-                if(generateMush()){
+            for(int row = 1; row < numRows - 1; row++){
+                if(col < numCols - playerAreaSize - centipedeAreaSize
+                        && generateMush() && (!hasMush(row-1, col-1)
+                        && !hasMush(row+1, col-1))){
                     int posX = row * mushSideLen + mushSideLen / 2;
                     int posY = col * mushSideLen + mushSideLen / 2;
 

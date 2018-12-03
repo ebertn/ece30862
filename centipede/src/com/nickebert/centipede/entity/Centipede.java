@@ -21,6 +21,8 @@ public class Centipede extends Entity {
 
     public static final int segmentLen = MushroomGrid.mushSideLen;
 
+    private boolean passedGridLine;
+
     private int dir, prevDir;
     private final int LEFT = -1;
     private final int DOWN = 0;
@@ -38,7 +40,9 @@ public class Centipede extends Entity {
         this.mg = mg;
 
         this.dir = LEFT;
-        this.maxSpeed = 1f;
+        this.prevDir = LEFT;
+        this.passedGridLine = false;
+        this.maxSpeed = 3f;
 
         this.alive = true;
 
@@ -57,9 +61,16 @@ public class Centipede extends Entity {
     // use gridPointFromPos
 
     public void update() {
-        super.update();
+        //super.update();
 
         gridPos = mg.gridPointFromPos(pos);
+        if(dir == RIGHT)
+            System.out.println("Dir = Right");
+        else if(dir == LEFT)
+            System.out.println("Dir = Left");
+        else
+            System.out.println("Dir = Down");
+//
         if(prevDir == RIGHT)
             System.out.println("Prev dir = Right");
         else if(prevDir == LEFT)
@@ -70,6 +81,63 @@ public class Centipede extends Entity {
         if(isHead()){
             // Follow rules for head motion
             GridPoint next = new GridPoint(gridPos.row + dir, gridPos.col);
+            if(dir == DOWN){
+                // if down is finished, change dir
+                System.out.println("First: " + passedGridLine + " " + (pos.y > 2 * (gridPos.col) * rad));
+                System.out.println("pos.y: " + pos.y + ", middle: " + (2 * (gridPos.col) * rad));
+                if(passedGridLine && (pos.y + 1) > 2 * (gridPos.col) * rad){ // In bottom half of box
+                    System.out.println("Holaaaaaaaaaaaaaaaaaaaaa");
+                    passedGridLine = false;
+                    dir = prevDir;
+                    changeDir();
+                } else {
+                    GridPoint down = new GridPoint(gridPos.row, gridPos.col + 1);
+                    Vector2f dest = mg.posFromGridPoint(down);
+                    GridPoint before = new GridPoint(gridPos);
+                    moveDown(dest.y);
+
+                    // Here it decides that down is the shit and
+                    // all other directions must be eliminated.
+                    // I have created down hitler
+
+                    // Change passedGridLine, based on if col has changed after moveDown
+                    this.gridPos = mg.gridPointFromPos(pos);
+                    System.out.println("Second: " + (!passedGridLine) + " " + (before.col != gridPos.col));
+                    if(!passedGridLine && before.col != gridPos.col){
+                        System.out.println("passGridLine changed - before = (" + before.row + ", " + before.col +  "), after = (" + gridPos.row + ", " + gridPos.col + ")");
+                        passedGridLine = true;
+                    }
+
+                }
+            } else {
+                //passedGridLine = false;
+                // if should go down, change dir to down
+                if((dir == RIGHT && pos.x > 2 * gridPos.row * rad + rad
+                        || dir == LEFT && pos.x < 2 * gridPos.row * rad + rad)
+                        && (mg.hasMush(next) || mg.isWall(next))){
+                    if(mg.isWall(next) && gridPos.col == (mg.numCols - mg.playerAreaSize - mg.centipedeAreaSize)){
+                        changeDir();
+                    } else {
+                        prevDir = dir;
+                        dir = DOWN;
+                    }
+                } else {
+                    Vector2f dest = mg.posFromGridPoint(next);
+                    if (dir == RIGHT) {
+                        //System.out.println("right");
+                        moveRight(dest.x);
+                        dir = RIGHT;
+                        prevDir = RIGHT;
+                    } else if (dir == LEFT) {
+                        //System.out.println("left");
+                        moveLeft(dest.x);
+                        dir = LEFT;
+                        prevDir = LEFT;
+                    }
+                }
+            }
+
+            /*GridPoint next = new GridPoint(gridPos.row + dir, gridPos.col);
             if(dir == DOWN || (dir == RIGHT && pos.x > 2 * gridPos.row * rad + rad
                                 || dir == LEFT && pos.x < 2 * gridPos.row * rad + rad)
                                 && (mg.hasMush(next) || wallAdjacent())){
@@ -84,12 +152,14 @@ public class Centipede extends Entity {
 //                }
                 // Going down, but dir != DOWN
 
-                System.out.println("Trying to go down");
+                System.out.println("Trying to go down " + dir);
+
                 GridPoint down = new GridPoint(gridPos.row, gridPos.col + 1);
                 Vector2f dest = mg.posFromGridPoint(down);
                 moveDown(dest.y);
                 if(dir != DOWN) {
                     dir = prevDir;
+                    //dir = DOWN;
                 } else {
                     System.out.println("Goes in here");
                     dir = prevDir;
@@ -103,6 +173,8 @@ public class Centipede extends Entity {
                 if(pos.y < 2 * gridPos.col * rad + rad){
                     prevDir = dir;
                     dir = DOWN;
+//                    dir = prevDir;
+//                    changeDir();
                 } else {
                     System.out.print("Trying to go ");
                     Vector2f dest = mg.posFromGridPoint(next);
@@ -119,10 +191,10 @@ public class Centipede extends Entity {
                         prevDir = LEFT;
                     }
                 }
-            }
+            }*/
         } else {
             // Follow ahead
-            moveToward(ahead.gridPos);
+            //moveToward(ahead.gridPos);
         }
     }
 
@@ -146,8 +218,12 @@ public class Centipede extends Entity {
     private void moveRight(float x){
         if(pos.x < x){
             dx = maxSpeed;
+
         }
         dy = 0;
+
+        this.pos.addX(dx);
+        this.pos.addY(dy);
     }
 
     private void moveLeft(float x){
@@ -155,6 +231,9 @@ public class Centipede extends Entity {
             dx = -maxSpeed;
         }
         dy = 0;
+
+        this.pos.addX(dx);
+        this.pos.addY(dy);
     }
 
     private void moveDown(float y){
@@ -162,6 +241,9 @@ public class Centipede extends Entity {
             dy = maxSpeed;
         }
         dx = 0;
+
+        this.pos.addX(dx);
+        this.pos.addY(dy);
     }
 
     private void moveToward(GridPoint gp){
@@ -202,7 +284,7 @@ public class Centipede extends Entity {
         if(alive) {
             g.setColor(new Color(174, 0, 9));
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            Shape theCircle = new Ellipse2D.Double(pos.x - rad, pos.y - rad, 2.0 * rad, 2.0 * rad);
+            Shape theCircle = new Ellipse2D.Double(pos.x - rad, pos.y /*- rad*/, 2.0 * rad, 2.0 * rad);
             g.fill(theCircle);
         }
     }
