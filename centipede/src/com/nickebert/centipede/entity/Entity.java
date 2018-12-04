@@ -7,10 +7,12 @@ import com.nickebert.centipede.utils.MouseHandler;
 import com.nickebert.centipede.utils.Vector2f;
 
 import java.awt.*;
+import java.util.ArrayList;
 
 public abstract class Entity {
 
     protected Sprite sprite;
+    protected ArrayList<Bullet> bullets;
     public Vector2f pos;
 
     protected boolean up;
@@ -23,11 +25,17 @@ public abstract class Entity {
 
     protected float maxSpeed;
 
+    protected int points;
+    protected boolean alive;
+
     protected Collision hitBounds = null;
 
-    public Entity(Sprite sprite){
+    public Entity(Sprite sprite, ArrayList<Bullet> bullets){
         this.sprite = sprite;
+        this.bullets = bullets;
         this.pos = new Vector2f(0, 0);
+
+        this.points = 0;
     }
 
     public void setSprite(Sprite sprite) {
@@ -47,12 +55,30 @@ public abstract class Entity {
     public float getSpeedx() {return dx; }
     public float getSpeedy() {return dy; }
 
-    public void update(){
-        //if (Math.pow(dx, 2) + Math.pow(dy, 2) <= Math.pow(maxSpeed, 2) + 0.001) {
+    public int update(){
+        this.points = 0;
         this.pos.addX(dx);
         this.pos.addY(dy);
-        //}
+
+        if(bullets != null) {
+            Bullet b;
+            for (int i = 0; i < bullets.size(); i++) {
+                b = bullets.get(i);
+                if (hitBounds.collides(b.getBounds())) {
+                    bullets.remove(i);
+                    bulletHit();
+                }
+            }
+        }
+
+        return this.points;
     }
+
+    public boolean isAlive(){
+        return alive;
+    }
+
+    public abstract void bulletHit();
 
     public abstract void render(Graphics2D g);
 

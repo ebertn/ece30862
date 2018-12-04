@@ -16,7 +16,7 @@ public class Bullet extends Entity {
     private final int height = 20;
 
     public Bullet(Sprite sprite, Vector2f pos) {
-        super(sprite);
+        super(sprite, null);
 
         this.pos = pos;
         this.setMaxSpeed(bullet_speed);
@@ -32,6 +32,9 @@ public class Bullet extends Entity {
     }
 
     // Update is handled by Entity class
+
+    @Override
+    public void bulletHit() {}
 
     @Override
     public void render(Graphics2D g) {

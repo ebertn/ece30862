@@ -20,7 +20,7 @@ public class Player extends Entity {
     private final int next_bullet_delay_nano = 200000000;
 
     public Player(Sprite sprite, ArrayList<Bullet> bullets){
-        super(sprite);
+        super(sprite, null);
 
         this.setMaxSpeed(0); // Mouse directly controls position
         this.bullets = bullets;
@@ -29,9 +29,14 @@ public class Player extends Entity {
 
     }
 
-    public void update() {
+    public int update() {
         super.update();
+
+        return points;
     }
+
+    @Override
+    public void bulletHit() {}
 
     @Override
     public void render(Graphics2D g) {

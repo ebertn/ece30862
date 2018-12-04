@@ -22,7 +22,11 @@ public class PlayState extends GameState {
     private Player player;
     private ArrayList<Bullet> bullets;
     private MushroomGrid mushGrid;
-    private Centipede centipede;
+    private ArrayList<Centipede> centipedes;
+    private final int centipedeLength = 6;
+    private Vector2f centipedeStart;
+
+    protected int points;
 
     public PlayState(GameStateManager gsm){
         super(gsm);
@@ -31,23 +35,34 @@ public class PlayState extends GameState {
         player = new Player(new Sprite("Empty"), bullets);
         mushGrid = new MushroomGrid(bullets);
 
-        Vector2f centipedeStart = mushGrid.posFromGridPoint(new GridPoint(mushGrid.numRows / 2, 1));
-        System.out.println("----------" + centipedeStart.x + " " + centipedeStart.y);
+        centipedeStart = mushGrid.posFromGridPoint(new GridPoint(0, 0));
+        centipedeStart.x -= Centipede.rad;
+        centipedeStart.y -= Centipede.rad;
 
-        centipede = new Centipede(new Sprite("Empty"), centipedeStart, bullets, mushGrid);
+        centipedes = new ArrayList<Centipede>();
+        createCentipede(centipedeStart, centipedeLength);
 
-//        GridPoint gp = mushGrid.gridPointFromPos(mushGrid.posFromGridPoint(new GridPoint(27, 1)));
-//        System.out.println(gp.row + " " + gp.col);
-//        Vector2f pos = mushGrid.posFromGridPoint(new GridPoint(0, 0));
-//        System.out.println(gp.row + " " + gp.col);
+        points = 0;
     }
 
     public void update(){
         player.update();
-        mushGrid.update();
-        centipede.update();
+        points += mushGrid.update();
 
-        //System.out.println(centipede.pos.x + " " + centipede.pos.y);
+        Centipede c;
+        for(int i = 0; i < centipedes.size(); i++){
+            c = centipedes.get(i);
+            if(!c.isAlive()) {
+                centipedes.remove(i);
+            } else {
+                points += c.update();
+            }
+        }
+
+        if(centipedes.size() <= 0){
+            points += 600;
+            createCentipede(centipedeStart, centipedeLength);
+        }
 
         Bullet b;
         for(int i = 0; i < bullets.size(); i++){
@@ -58,6 +73,8 @@ public class PlayState extends GameState {
                 b.update();
             }
         }
+
+        System.out.println(points);
     }
 
     public void input(MouseHandler mouse, KeyHandler key){
@@ -66,12 +83,27 @@ public class PlayState extends GameState {
 
     public void render(Graphics2D g){
         player.render(g);
-        centipede.render(g);
+
+        for(Centipede c: centipedes){
+            c.render(g);
+        }
 
         for(Bullet b: bullets){
             b.render(g);
         }
 
         mushGrid.render(g);
+    }
+
+    private void createCentipede(Vector2f startPos, int len){
+        Sprite sprite = new Sprite("Empty");
+        Centipede cur;
+        Centipede ahead = new Centipede(sprite, new Vector2f(startPos.x, startPos.y), bullets, mushGrid);
+        centipedes.add(ahead);
+        for(int i = 1; i < len; i++){
+            cur = new Centipede(sprite, ahead);
+            centipedes.add(cur);
+            ahead = cur;
+        }
     }
 }

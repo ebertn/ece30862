@@ -13,10 +13,9 @@ public class Mushroom extends Entity {
     private ArrayList<Bullet> bullets;
     public static final int rad = 12;
     private int lives = 3;
-    private boolean alive;
 
     public Mushroom(Sprite sprite, Vector2f pos, ArrayList<Bullet> bullets) {
-        super(sprite);
+        super(sprite, bullets);
         this.pos = pos;
         alive = true;
         this.bullets = bullets;
@@ -24,21 +23,24 @@ public class Mushroom extends Entity {
         this.hitBounds = new Collision(pos, rad, rad);
     }
 
-    public void update() {
-        super.update();
-
-        Bullet b;
-        for(int i = 0; i < bullets.size(); i++) {
-            b = bullets.get(i);
-            if (hitBounds.collides(b.getBounds())) {
-                lives--;
-                bullets.remove(i);
-            }
-
-            if(lives <= 0){
-                alive = false;
-            }
+    public int update() {
+        if(alive) {
+            super.update();
         }
+
+        return points;
+    }
+
+    @Override
+    public void bulletHit() {
+        lives--;
+        points += 1;
+        if(lives <= 0){
+            alive = false;
+            points += 5;
+        }
+
+        //System.out.println("Bullet hit. Points = " + points);
     }
 
     @Override
@@ -51,7 +53,4 @@ public class Mushroom extends Entity {
         }
     }
 
-    public boolean isAlive(){
-        return alive;
-    }
 }

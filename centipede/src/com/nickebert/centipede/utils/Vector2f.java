@@ -11,7 +11,8 @@ public class Vector2f {
     }
 
     public Vector2f(Vector2f vec) {
-        new Vector2f(vec.x, vec.y);
+        this.x = vec.x;
+        this.y = vec.y;
     }
 
     public Vector2f(float x, float y) {
@@ -55,6 +56,15 @@ public class Vector2f {
     public void setVector(float x, float y) {
         this.x = x;
         this.y = y;
+    }
+
+    public float dist(Vector2f v){
+        return (float) Math.sqrt(Math.pow(v.x - this.x, 2) + Math.pow(v.y - this.y, 2));
+    }
+
+    public Vector2f normalize(){
+        float norm = (float) Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2));
+        return new Vector2f(this.x / norm, this.y / norm);
     }
 
     @Override

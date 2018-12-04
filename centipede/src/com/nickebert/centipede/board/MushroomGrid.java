@@ -23,9 +23,11 @@ public class MushroomGrid {
     public static int numRows;
     public static int numCols;
 
-    private final float mushChance = 0.4f;
+    private final float mushChance = 0.1f;
     public final static int playerAreaSize = 6;
     public final static int centipedeAreaSize = 1;
+
+    protected int points;
 
     public MushroomGrid(ArrayList<Bullet> bullets){
         this.bullets = bullets;
@@ -39,11 +41,13 @@ public class MushroomGrid {
         numCols = (winHeight + mushSideLen) / mushSideLen;
 
         grid = new Mushroom[numRows][numCols];
+        points = 0;
 
         generateGrid();
     }
 
-    public void update(){
+    public int update(){
+        points = 0;
         Mushroom m;
         for(int col = 0; col < numCols; col++) {
             for (int row = 0; row < numRows; row++) {
@@ -52,11 +56,13 @@ public class MushroomGrid {
                     if(!m.isAlive()) {
                         grid[row][col] = null;
                     } else {
-                        m.update();
+                        points += m.update();
                     }
                 }
             }
         }
+
+        return points;
     }
 
     public void render(Graphics2D g){
@@ -116,6 +122,13 @@ public class MushroomGrid {
         int posY = gp.col * mushSideLen + mushSideLen / 2;
 
         return new Vector2f(posX, posY);
+    }
+
+    public void addMushroom(GridPoint gp){
+        int posX = gp.row * mushSideLen + mushSideLen / 2;
+        int posY = gp.col * mushSideLen + mushSideLen / 2;
+        grid[gp.row][gp.col] = new Mushroom(new Sprite("Empty"),
+                new Vector2f(posX, posY), bullets);
     }
 
 }
