@@ -1,5 +1,6 @@
 package com.nickebert.centipede.states;
 
+import com.nickebert.centipede.GamePanel;
 import com.nickebert.centipede.Window;
 import com.nickebert.centipede.board.MushroomGrid;
 import com.nickebert.centipede.entity.Bullet;
@@ -16,6 +17,9 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Vector;
+import java.util.concurrent.TimeUnit;
+
+import static java.lang.Thread.sleep;
 
 public class PlayState extends GameState {
 
@@ -27,6 +31,7 @@ public class PlayState extends GameState {
     private Vector2f centipedeStart;
 
     protected int points;
+
 
     public PlayState(GameStateManager gsm){
         super(gsm);
@@ -43,10 +48,12 @@ public class PlayState extends GameState {
         createCentipede(centipedeStart, centipedeLength);
 
         points = 0;
+
     }
 
     public void update(){
         player.update();
+
         points += mushGrid.update();
 
         Centipede c;
@@ -56,6 +63,11 @@ public class PlayState extends GameState {
                 centipedes.remove(i);
             } else {
                 points += c.update();
+            }
+
+            if(player.getBounds().collides(c.getBounds())){
+                playerDeath();
+                return;
             }
         }
 
@@ -74,7 +86,9 @@ public class PlayState extends GameState {
             }
         }
 
-        System.out.println(points);
+        if(player.lives <= 0){
+            restartGame();
+        }
     }
 
     public void input(MouseHandler mouse, KeyHandler key){
@@ -82,6 +96,7 @@ public class PlayState extends GameState {
     }
 
     public void render(Graphics2D g){
+
         player.render(g);
 
         for(Centipede c: centipedes){
@@ -93,6 +108,33 @@ public class PlayState extends GameState {
         }
 
         mushGrid.render(g);
+
+        renderStats(g);
+
+    }
+
+    public void renderStats(Graphics2D g){
+        g.setColor(new Color(0, 174, 169));
+        g.setFont(new Font("Arial", Font.PLAIN, Window.score_height));
+        g.drawString("Score: " + points, 10, Window.game_height + Window.score_height - 10);
+
+        g.drawString("Lives: " + player.lives, Window.game_width - 200, Window.game_height + Window.score_height - 10);
+    }
+
+    private void playerDeath(){
+        player.lives--;
+        points += mushGrid.restore();
+        centipedes.clear();
+        createCentipede(centipedeStart, centipedeLength);
+        bullets.clear();
+    }
+
+    private void restartGame(){
+        player.lives = 3;
+        points = 0;
+        centipedes.clear();
+        createCentipede(centipedeStart, centipedeLength);
+        mushGrid = new MushroomGrid(bullets);
     }
 
     private void createCentipede(Vector2f startPos, int len){

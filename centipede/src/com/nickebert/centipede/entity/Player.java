@@ -27,6 +27,7 @@ public class Player extends Entity {
 
         this.hitBounds = new Collision(pos, width, height);
 
+        lives = 3;
     }
 
     public int update() {
@@ -44,11 +45,15 @@ public class Player extends Entity {
         g.fillRect((int) this.pos.x - width/2, (int) this.pos.y, width, height);
     }
 
+
+
     public void input(MouseHandler mouse, KeyHandler key){
         super.input(mouse, key);
 
-        this.pos.setX(mouse.getX());
-        this.pos.setY(mouse.getY());
+        if(mouse.inBounds()) {
+            this.pos.setX(mouse.getX());
+            this.pos.setY(mouse.getY());
+        }
 
         if(last_shot_time + next_bullet_delay_nano < System.nanoTime()
                 && key.attack.down){

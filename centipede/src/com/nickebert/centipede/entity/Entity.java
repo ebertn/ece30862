@@ -5,6 +5,7 @@ import com.nickebert.centipede.utils.Collision;
 import com.nickebert.centipede.utils.KeyHandler;
 import com.nickebert.centipede.utils.MouseHandler;
 import com.nickebert.centipede.utils.Vector2f;
+import com.nickebert.centipede.Window;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -27,13 +28,14 @@ public abstract class Entity {
 
     protected int points;
     protected boolean alive;
+    public int lives;
 
     protected Collision hitBounds = null;
 
     public Entity(Sprite sprite, ArrayList<Bullet> bullets){
         this.sprite = sprite;
         this.bullets = bullets;
-        this.pos = new Vector2f(0, 0);
+        this.pos = new Vector2f(Window.game_width / 2, 7 * Window.game_height / 8 );
 
         this.points = 0;
     }

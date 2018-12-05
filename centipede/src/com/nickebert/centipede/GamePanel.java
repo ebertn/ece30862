@@ -7,6 +7,7 @@ import com.nickebert.centipede.utils.MouseHandler;
 
 import javax.swing.JPanel;
 import java.awt.*;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 
 public class GamePanel extends JPanel implements Runnable{
@@ -15,7 +16,7 @@ public class GamePanel extends JPanel implements Runnable{
     public static int height;
 
     private Thread thread;
-    private boolean running = false;
+    public static boolean running = false;
 
     private BufferedImage img;
     private Graphics2D g;
@@ -25,9 +26,13 @@ public class GamePanel extends JPanel implements Runnable{
 
     private GameStateManager gsm;
 
+    Window window;
+
     public GamePanel(int width, int height){
         this.width = width;
         this.height = height;
+
+        this.window = window;
 
         setPreferredSize(new Dimension(width, height));
         setFocusable(true);

@@ -24,7 +24,6 @@ public class Centipede extends Entity {
     public static final int segmentLen = MushroomGrid.mushSideLen;
 
     private boolean passedGridLine;
-    private int lives = 2;
 
     private int dir, prevDir;
     private final int LEFT = -1;
@@ -50,6 +49,7 @@ public class Centipede extends Entity {
         this.maxSpeed = 3f;
 
         this.alive = true;
+        this.lives = 2;
 
         this.ahead = null;
         this.back = null;

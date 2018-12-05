@@ -65,6 +65,22 @@ public class MushroomGrid {
         return points;
     }
 
+    public int restore(){
+        int points = 0;
+        Mushroom m;
+        for(int col = 0; col < numCols; col++) {
+            for (int row = 0; row < numRows; row++) {
+                m = grid[row][col];
+                if(m != null && m.lives < 3){
+                    m.lives = 3;
+                    points += 10;
+                }
+            }
+        }
+
+        return points;
+    }
+
     public void render(Graphics2D g){
         Mushroom m;
         for(int col = 0; col < numCols; col++) {

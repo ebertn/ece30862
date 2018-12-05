@@ -1,6 +1,7 @@
 package com.nickebert.centipede.utils;
 
 import com.nickebert.centipede.GamePanel;
+import com.nickebert.centipede.Window;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -15,6 +16,10 @@ public class MouseHandler implements MouseListener, MouseMotionListener {
     public MouseHandler(GamePanel game){
         game.addMouseListener(this);
         game.addMouseMotionListener(this);
+    }
+
+    public boolean inBounds(){
+        return mouseX < Window.game_width && mouseX > 0 && mouseY < Window.game_height && mouseY > 0;
     }
 
     public int getX(){

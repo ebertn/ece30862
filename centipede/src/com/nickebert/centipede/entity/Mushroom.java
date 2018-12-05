@@ -12,12 +12,12 @@ public class Mushroom extends Entity {
 
     private ArrayList<Bullet> bullets;
     public static final int rad = 12;
-    private int lives = 3;
 
     public Mushroom(Sprite sprite, Vector2f pos, ArrayList<Bullet> bullets) {
         super(sprite, bullets);
         this.pos = pos;
         alive = true;
+        this.lives = 3;
         this.bullets = bullets;
 
         this.hitBounds = new Collision(pos, rad, rad);
