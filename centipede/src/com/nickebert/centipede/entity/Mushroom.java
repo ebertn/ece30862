@@ -39,8 +39,6 @@ public class Mushroom extends Entity {
             alive = false;
             points += 5;
         }
-
-        //System.out.println("Bullet hit. Points = " + points);
     }
 
     @Override

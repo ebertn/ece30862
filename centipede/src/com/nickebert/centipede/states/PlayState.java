@@ -3,10 +3,7 @@ package com.nickebert.centipede.states;
 import com.nickebert.centipede.GamePanel;
 import com.nickebert.centipede.Window;
 import com.nickebert.centipede.board.MushroomGrid;
-import com.nickebert.centipede.entity.Bullet;
-import com.nickebert.centipede.entity.Centipede;
-import com.nickebert.centipede.entity.Mushroom;
-import com.nickebert.centipede.entity.Player;
+import com.nickebert.centipede.entity.*;
 import com.nickebert.centipede.graphics.Sprite;
 import com.nickebert.centipede.utils.GridPoint;
 import com.nickebert.centipede.utils.KeyHandler;
@@ -14,6 +11,7 @@ import com.nickebert.centipede.utils.MouseHandler;
 import com.nickebert.centipede.utils.Vector2f;
 
 import java.awt.*;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Vector;
@@ -29,12 +27,17 @@ public class PlayState extends GameState {
     private ArrayList<Centipede> centipedes;
     private final int centipedeLength = 6;
     private Vector2f centipedeStart;
+    private Spider spider;
+
+    public static File bulletSound;
 
     protected int points;
 
 
     public PlayState(GameStateManager gsm){
         super(gsm);
+
+        bulletSound = new File("/home/ebertn/School/ece30862/centipede/sounds/bullet_sound.wav");
 
         bullets = new ArrayList<Bullet>();
         player = new Player(new Sprite("Empty"), bullets);
@@ -46,6 +49,8 @@ public class PlayState extends GameState {
 
         centipedes = new ArrayList<Centipede>();
         createCentipede(centipedeStart, centipedeLength);
+
+        spider = new Spider(new Sprite("Empty"), bullets);
 
         points = 0;
 
@@ -86,6 +91,13 @@ public class PlayState extends GameState {
             }
         }
 
+        points += spider.update();
+
+        if(player.getBounds().collides(spider.getBounds())){
+            playerDeath();
+            return;
+        }
+
         if(player.lives <= 0){
             restartGame();
         }
@@ -109,6 +121,8 @@ public class PlayState extends GameState {
 
         mushGrid.render(g);
 
+        spider.render(g);
+
         renderStats(g);
 
     }
@@ -127,6 +141,7 @@ public class PlayState extends GameState {
         centipedes.clear();
         createCentipede(centipedeStart, centipedeLength);
         bullets.clear();
+        spider = spider = new Spider(new Sprite("Empty"), bullets);
     }
 
     private void restartGame(){

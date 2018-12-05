@@ -67,6 +67,12 @@ public class Vector2f {
         return new Vector2f(this.x / norm, this.y / norm);
     }
 
+    public static Vector2f randUnitVector2f(){
+        float xComp = (float) (2 * Math.random() - 1);
+        float yComp = (float) (2 * Math.random() - 1);
+        return new Vector2f(xComp, yComp).normalize();
+    }
+
     @Override
     public String toString() {
         return x + ", " + y;

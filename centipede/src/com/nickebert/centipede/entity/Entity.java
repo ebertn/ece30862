@@ -59,6 +59,7 @@ public abstract class Entity {
 
     public int update(){
         this.points = 0;
+
         this.pos.addX(dx);
         this.pos.addY(dy);
 
